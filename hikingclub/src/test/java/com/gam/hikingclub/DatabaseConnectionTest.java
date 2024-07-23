@@ -1,5 +1,7 @@
 package com.gam.hikingclub;
 
+import com.gam.hikingclub.entity.Member;
+import com.gam.hikingclub.repository.MemberRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

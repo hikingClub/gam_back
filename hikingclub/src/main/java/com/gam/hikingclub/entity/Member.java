@@ -1,4 +1,4 @@
-package com.gam.hikingclub;
+package com.gam.hikingclub.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,6 +15,7 @@ import lombok.ToString;
 public class Member {
 
     @Id
+    private Integer seq;
     private String nickname;
     private String id;
     private String email;
