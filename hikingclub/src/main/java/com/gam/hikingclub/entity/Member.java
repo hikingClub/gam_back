@@ -1,4 +1,4 @@
-package com.gam.hikingclub;
+package com.gam.hikingclub.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
