@@ -2,6 +2,8 @@ package com.gam.signup;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -25,7 +27,5 @@ public class Member {
     private String jobRange;
     private int alarmCheck;
     private String interestKeyword;
-
-
 
 }
