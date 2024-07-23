@@ -38,15 +38,17 @@ public class MemberService {
     public Member login(Member member) throws Exception {
         // 아이디 중복체크
         Optional<Member> optionalMember = memberRepository.findById(member.getId());
+        System.out.println("1241" + optionalMember);
         if (optionalMember.isEmpty()) {
             throw new Exception("존재하지 않는 아이디입니다.");
         }
-
+        System.out.println("아이디 체크 함");
         // 비밀번호 중복체크
         Member existingMember = optionalMember.get();
         if (!passwordEncoder.matches(member.getPassword(), existingMember.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
         }
+        System.out.println("비번 체크도 함");
 
         return existingMember;
     }

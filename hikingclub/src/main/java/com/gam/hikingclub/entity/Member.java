@@ -15,6 +15,7 @@ import lombok.ToString;
 public class Member {
 
     @Id
+    private Integer seq;
     private String nickname;
     private String id;
     private String email;

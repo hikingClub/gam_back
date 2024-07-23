@@ -29,9 +29,11 @@ public class MemberController {
     public ResponseEntity<String> login(@RequestBody Member member, HttpSession session) {
         try {
             Member loggedIn = memberService.login(member);
-            // 세션에 아이디 추가
-            session.setAttribute("memberId", loggedIn.getId());
-            return ResponseEntity.ok("로그인 성공! 세션 ID: " + session.getId());
+            // 세션에 유저시퀀스 추가
+            System.out.println("세션 넣기전임");
+            session.setAttribute("memberSeq", loggedIn.getSeq());
+            System.out.println("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
+            return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq"));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("로그인 실패 사유: " + e.getMessage());
         }
