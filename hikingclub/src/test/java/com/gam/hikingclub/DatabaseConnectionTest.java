@@ -1,4 +1,3 @@
-/*
 package com.gam.hikingclub;
 
 import com.gam.hikingclub.entity.Member;
@@ -44,4 +43,3 @@ public class DatabaseConnectionTest {
         Assertions.assertEquals("password", foundByEmail.get().getPassword());
     }
 }
-*/
