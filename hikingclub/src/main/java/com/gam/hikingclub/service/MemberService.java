@@ -24,7 +24,7 @@ public class MemberService {
         }
 
         // 아이디 중복 체크
-        if (memberRepository.findById(member.getId()).isPresent()) {
+        if (memberRepository.findByUid(member.getUid()).isPresent()) {
             throw new Exception("중복된 아이디입니다.");
         }
 
@@ -37,7 +37,7 @@ public class MemberService {
 
     public Member login(Member member) throws Exception {
         // 아이디 중복체크
-        Optional<Member> optionalMember = memberRepository.findById(member.getId());
+        Optional<Member> optionalMember = memberRepository.findById(member.getUid());
         System.out.println("1241" + optionalMember);
         if (optionalMember.isEmpty()) {
             throw new Exception("존재하지 않는 아이디입니다.");
