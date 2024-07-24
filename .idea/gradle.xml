@@ -4,8 +4,14 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+<<<<<<< HEAD
         <option name="externalProjectPath" value="$PROJECT_DIR$/hikingclub" />
         <option name="gradleJvm" value="#JAVA_HOME" />
+=======
+        <option name="delegatedBuild" value="false" />
+        <option name="testRunner" value="PLATFORM" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/hikingclub" />
+>>>>>>> 1c5932d3b02ec79c304e207a554b9732108c0173
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/hikingclub" />

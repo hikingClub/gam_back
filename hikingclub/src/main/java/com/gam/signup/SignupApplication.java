@@ -1,13 +1,12 @@
-package com.gam.hikingclub;
+package com.gam.signup;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HikingclubApplication {
+public class SignupApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(HikingclubApplication.class, args);
+        SpringApplication.run(SignupApplication.class, args);
     }
-
 }
