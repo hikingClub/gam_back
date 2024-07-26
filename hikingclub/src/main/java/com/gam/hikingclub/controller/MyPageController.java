@@ -22,8 +22,8 @@ public class MyPageController {
     // 현재 로그인한 유저를 세션에서 가져오는 메서드
     private Member getLoggedInUser(HttpSession session) throws Exception {
         // 이 부분을 통해 강제적으로 Seq를 정해줄 수있음 postman 테스트용임
-        Integer memberSeq = 5;
-        // Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        //Integer memberSeq = 3;
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
 
         if (memberSeq == null) {
             throw new Exception("로그인시 마이페이지에 접근이 가능합니다.");
@@ -75,6 +75,18 @@ public class MyPageController {
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(401).body("비밀번호 변경 실패 사유: " + e.getMessage());
+        }
+    }
+
+    // 회원을 삭제하는 엔드포인트
+    @PostMapping("/settings/quit")
+    public ResponseEntity<?> quitUser(HttpSession session) {
+        try {
+            Member member = getLoggedInUser(session);
+            myPageService.deleteUser(member.getSeq());
+            return ResponseEntity.ok("회원 탈퇴가 성공적으로 처리되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("회원 탈퇴 실패 사유: " + e.getMessage());
         }
     }
 

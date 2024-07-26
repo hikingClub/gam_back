@@ -53,4 +53,15 @@ public class MyPageService {
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
     }
+
+    // 회원을 삭제하는 메소드
+    public void deleteUser(int seq) throws Exception {
+        Member member = getMemberBySeq(seq);
+
+        // 회원의 검색 기록 디비 삭제 더 추가해야할듯 검색기록말고 다른 디비에 존재하는 모두
+        searchHistoryRepository.deleteBySeq(seq);
+
+        // 회원 삭제
+        memberRepository.delete(member);
+    }
 }
