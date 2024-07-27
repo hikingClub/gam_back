@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/member/signup", "/member/login").permitAll() // /signup 및 /login 경로는 인증 없이 접근 가능
+                                .requestMatchers("/mypage/**").permitAll() // /mypage 경로는 인증 없이 접근 가능
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
                 .formLogin(form -> form.disable()); // 폼 로그인 비활성화
