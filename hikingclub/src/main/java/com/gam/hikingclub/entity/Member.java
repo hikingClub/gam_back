@@ -19,6 +19,7 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer seq;
+    private String recIndexes;
     private String nickname;
     private String uid;
     private String email;

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Integer> {
     List<SearchHistory> findBySeq(Integer seq);
+
+    void deleteBySeq(Integer seq);
 }

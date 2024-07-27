@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.gam.hikingclub.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.gam.hikingclub.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/endproject.iml" filepath="$PROJECT_DIR$/.idea/endproject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hikingclub.iml" filepath="$PROJECT_DIR$/.idea/modules/hikingclub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hikingclub.test.iml" filepath="$PROJECT_DIR$/.idea/modules/hikingclub.test.iml" />
+    </modules>
+  </component>
+</project>
