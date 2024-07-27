@@ -17,6 +17,11 @@ public class MemberService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private MailService mailService;
+
+    private int verificationCode;
+
     public void signup(Member member) throws Exception {
         // 이메일 중복 체크
         if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
@@ -35,6 +40,14 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public void sendVerificationMail(String email) throws Exception {
+        verificationCode = mailService.sendMail(email);
+    }
+
+    public boolean checkVerificationCode(String inputCode) {
+        return String.valueOf(verificationCode).equals(inputCode);
+    }
+
     public Member login(Member member) throws Exception {
         // 아이디 중복체크
         Optional<Member> optionalMember = memberRepository.findByUid(member.getUid());
@@ -42,7 +55,7 @@ public class MemberService {
             throw new Exception("존재하지 않는 아이디입니다.");
         }
 
-        // 비밀번호 중복체크
+        // 비밀번호 체크
         Member existingMember = optionalMember.get();
         if (!passwordEncoder.matches(member.getPassword(), existingMember.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
