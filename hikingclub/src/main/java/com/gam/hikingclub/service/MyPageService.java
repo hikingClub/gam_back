@@ -1,19 +1,27 @@
 package com.gam.hikingclub.service;
 
+
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.RecommendedField;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.RecommendFieldRepository;
 import com.gam.hikingclub.entity.SearchHistory;
+
+import com.gam.hikingclub.entity.Member;
+import com.gam.hikingclub.entity.SearchHistory;
+import com.gam.hikingclub.repository.MemberRepository;
+
 import com.gam.hikingclub.repository.SearchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class MyPageService {
@@ -138,7 +146,6 @@ public class MyPageService {
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
     }
-
     // 회원을 삭제하는 메소드
     public void deleteUser(int seq) throws Exception {
         Member member = getMemberBySeq(seq);
