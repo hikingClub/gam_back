@@ -1,22 +1,17 @@
 package com.gam.hikingclub.controller;
 
+import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
+import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.service.MemberService;
-import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.service.MyPageService;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +30,8 @@ public class MyPageController {
 
     // 현재 로그인한 유저를 세션에서 가져오는 메서드
     private Member getLoggedInUser(HttpSession session) throws Exception {
-        // 이 부분을 통해 강제적으로 Seq를 정해줄 수있음 postman 테스트용임
-        //Integer memberSeq = 3;
+        // 이 부분을 통해 강제적으로 Seq를 정해줄 수 있음 postman 테스트용임
+        // Integer memberSeq = 4;
         Integer memberSeq = (Integer) session.getAttribute("memberSeq");
 
         if (memberSeq == null) {
@@ -45,25 +40,12 @@ public class MyPageController {
         return myPageService.getMemberBySeq(memberSeq);
     }
 
-    @PostMapping("/getRecommendField")
-    public ResponseEntity<Map<String, Object>> getRecommendField(@RequestBody Member member) {
-        try {
-            List<String> recommendFieldList = myPageService.getRecommendFieldName(member.getSeq());
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "성공");
-            response.put("recommendFieldList", recommendFieldList);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "오류 메세지: " + e.getMessage());
-            return ResponseEntity.status(401).body(errorResponse);
-        }
-    }
 
-    @PostMapping("/insertRecIndexes")
-    public ResponseEntity<String> insertRecIndexes(@RequestBody Member member) {
+    @PostMapping("/setRecommendSetting")
+    public ResponseEntity<String> setRecommendSetting(HttpSession session, @RequestBody Member member) {
         try {
-            myPageService.setRecIndexes(member);
+            member.setSeq(getLoggedInUser(session).getSeq());
+            myPageService.setRecommendSetting(member);
             return ResponseEntity.ok("성공!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("에러 이유" + e.getMessage());
@@ -71,12 +53,22 @@ public class MyPageController {
     }
 
     @PostMapping("/getRecommendSetting")
-    public ResponseEntity<String> getRecommendSetting(@RequestBody Member member) {
+    public ResponseEntity<Map<String, Object>> getRecommendSetting(HttpSession session) {
         try {
-            myPageService.setRecIndexes(member);
-            return ResponseEntity.ok("성공!");
+            Member member = getLoggedInUser(session);
+            List<String> recommendFieldList = myPageService.getRecommendFieldName(member.getSeq());
+            MemberRecommendDTO memberRecommendDTO = myPageService.getRecommendedSetting(member.getSeq());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "성공");
+            response.put("recommendFieldList", recommendFieldList);
+            response.put("interest", memberRecommendDTO.getInterest());
+            response.put("ageRange", memberRecommendDTO.getAgeRange());
+            response.put("jobRange", memberRecommendDTO.getJobRange());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("에러 이유" + e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "오류 메세지: " + e.getMessage());
+            return ResponseEntity.status(401).body(errorResponse);
         }
     }
 

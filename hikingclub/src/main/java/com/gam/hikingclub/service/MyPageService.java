@@ -1,19 +1,27 @@
 package com.gam.hikingclub.service;
 
+
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.RecommendedField;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.RecommendFieldRepository;
 import com.gam.hikingclub.entity.SearchHistory;
+
+import com.gam.hikingclub.entity.Member;
+import com.gam.hikingclub.entity.SearchHistory;
+import com.gam.hikingclub.repository.MemberRepository;
+
 import com.gam.hikingclub.repository.SearchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class MyPageService {
@@ -24,15 +32,7 @@ public class MyPageService {
     @Autowired
     private RecommendFieldRepository recommendFieldRepository;
 
-    public Member getMember(Integer seq) throws Exception {
-        Optional<Member> optionalMember = memberRepository.findBySeq(seq);
-        if (optionalMember.isEmpty()) {
-            throw new Exception("존재하지 않는 멤버 번호입니다.");
-        }
-        return optionalMember.get();
-    }
-
-
+    // 숫자로 되어있는 RecIndexes를 RecIndex에 대입해서 가져옴
     public List<String> getRecommendFieldName(Integer seq) throws Exception {
         List<String> recommendList = new ArrayList<>();
         List<Integer> recIndexList = new ArrayList<>();
@@ -73,17 +73,7 @@ public class MyPageService {
         return recommendList;
     }
 
-    public void setRecIndexes(Member member) throws Exception {
-        Optional<Member> optionalMember = memberRepository.findBySeq(member.getSeq());
-        if (optionalMember.isPresent()) {
-            Member updateMember = optionalMember.get();
-            updateMember.setRecIndexes(member.getRecIndexes());
-            memberRepository.save(updateMember);
-        } else {
-            throw new Exception("존재하지 않는 멤버입니다.");
-        }
-    }
-
+    //DTO를 이용해서 관심분야, 나이, 직업을 불러옴
     public MemberRecommendDTO getRecommendedSetting(Integer seq) throws Exception {
         Optional<Member> optionalMember = memberRepository.findBySeq(seq);
         if (optionalMember.isEmpty()) {
@@ -92,11 +82,15 @@ public class MyPageService {
         return new MemberRecommendDTO(optionalMember.get().getInterest(), optionalMember.get().getJobRange(), optionalMember.get().getAgeRange());
     }
 
-    public void setInterest(Member member) throws Exception {
+    // 추천설정 업데이트
+    public void setRecommendSetting(Member member) throws Exception {
         Optional<Member> optionalMember = memberRepository.findBySeq(member.getSeq());
         if (optionalMember.isPresent()) {
             Member updateMember = optionalMember.get();
             updateMember.setRecIndexes(member.getRecIndexes());
+            updateMember.setInterest(member.getInterest());
+            updateMember.setJobRange(member.getJobRange());
+            updateMember.setAgeRange(member.getAgeRange());
             memberRepository.save(updateMember);
         } else {
             throw new Exception("존재하지 않는 멤버입니다.");
@@ -138,7 +132,6 @@ public class MyPageService {
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
     }
-
     // 회원을 삭제하는 메소드
     public void deleteUser(int seq) throws Exception {
         Member member = getMemberBySeq(seq);
