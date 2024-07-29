@@ -1,5 +1,6 @@
 package com.gam.hikingclub.controller;
 
+import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.repository.MemberRepository;
@@ -39,25 +40,12 @@ public class MyPageController {
         return myPageService.getMemberBySeq(memberSeq);
     }
 
-    @PostMapping("/getRecommendField")
-    public ResponseEntity<Map<String, Object>> getRecommendField(@RequestBody Member member) {
-        try {
-            List<String> recommendFieldList = myPageService.getRecommendFieldName(member.getSeq());
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "성공");
-            response.put("recommendFieldList", recommendFieldList);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "오류 메세지: " + e.getMessage());
-            return ResponseEntity.status(401).body(errorResponse);
-        }
-    }
 
-    @PostMapping("/insertRecIndexes")
-    public ResponseEntity<String> insertRecIndexes(@RequestBody Member member) {
+    @PostMapping("/setRecommendSetting")
+    public ResponseEntity<String> setRecommendSetting(HttpSession session, @RequestBody Member member) {
         try {
-            myPageService.setRecIndexes(member);
+            member.setSeq(getLoggedInUser(session).getSeq());
+            myPageService.setRecommendSetting(member);
             return ResponseEntity.ok("성공!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("에러 이유" + e.getMessage());
@@ -65,12 +53,22 @@ public class MyPageController {
     }
 
     @PostMapping("/getRecommendSetting")
-    public ResponseEntity<String> getRecommendSetting(@RequestBody Member member) {
+    public ResponseEntity<Map<String, Object>> getRecommendSetting(HttpSession session) {
         try {
-            myPageService.setRecIndexes(member);
-            return ResponseEntity.ok("성공!");
+            Member member = getLoggedInUser(session);
+            List<String> recommendFieldList = myPageService.getRecommendFieldName(member.getSeq());
+            MemberRecommendDTO memberRecommendDTO = myPageService.getRecommendedSetting(member.getSeq());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "성공");
+            response.put("recommendFieldList", recommendFieldList);
+            response.put("interest", memberRecommendDTO.getInterest());
+            response.put("ageRange", memberRecommendDTO.getAgeRange());
+            response.put("jobRange", memberRecommendDTO.getJobRange());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("에러 이유" + e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "오류 메세지: " + e.getMessage());
+            return ResponseEntity.status(401).body(errorResponse);
         }
     }
 
