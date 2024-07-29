@@ -14,38 +14,32 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
+    // 회원가입 요청 처리
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody Member member) {
         try {
             memberService.signup(member);
-            return ResponseEntity.ok("회원가입 성공!");
+            return ResponseEntity.ok("회원가입 성공! 이메일 인증을 완료해주세요.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("회원가입 실패 사유: " + e.getMessage());
         }
     }
 
-    @PostMapping("/sendVerificationMail")
-    public ResponseEntity<String> sendVerificationMail(@RequestParam String email) {
-        try {
-            memberService.sendVerificationMail(email);
-            return ResponseEntity.ok("인증 이메일이 발송되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("인증 이메일 발송 실패: " + e.getMessage());
+    // 이메일 인증 코드 확인 요청 처리
+    @PostMapping("/verifyEmail")
+    public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String code) {
+        boolean isVerified = memberService.checkVerificationCode(email, code);
+        if (isVerified) {
+            return ResponseEntity.ok("이메일 인증 성공!");
+        } else {
+            return ResponseEntity.badRequest().body("이메일 인증 실패: 잘못된 인증 코드입니다.");
         }
     }
 
-    @GetMapping("/checkVerificationCode")
-    public ResponseEntity<Boolean> checkVerificationCode(@RequestParam String userNumber) {
-        boolean isMatch = memberService.checkVerificationCode(userNumber);
-        return ResponseEntity.ok(isMatch);
-    }
-
+    // 로그인 요청 처리
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Member member, @RequestParam String verificationCode, HttpSession session) {
+    public ResponseEntity<String> login(@RequestBody Member member, HttpSession session) {
         try {
-            if (!memberService.checkVerificationCode(verificationCode)) {
-                throw new Exception("이메일 인증 번호가 일치하지 않습니다.");
-            }
             Member loggedIn = memberService.login(member);
             // 세션에 유저 시퀀스 추가
             session.setAttribute("memberSeq", loggedIn.getSeq());
@@ -55,6 +49,7 @@ public class MemberController {
         }
     }
 
+    // 로그아웃 요청 처리
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         // 로그아웃 시 세션을 비움
