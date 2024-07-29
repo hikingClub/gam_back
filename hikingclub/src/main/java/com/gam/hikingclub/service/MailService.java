@@ -14,12 +14,12 @@ public class MailService {
     private final JavaMailSender javaMailSender;
     private static final String senderEmail = "your-email@gmail.com"; // 발신자 이메일 주소
 
-    // 랜덤으로 숫자 생성
+    // 랜덤 인증 코드를 생성하는 메소드
     public static String createToken() {
-        return String.valueOf((int) (Math.random() * (90000)) + 100000); //(int) Math.random() * (최댓값-최소값+1) + 최소값
+        return String.valueOf((int) (Math.random() * (90000)) + 100000); // 100000 ~ 999999 사이의 랜덤 숫자 생성
     }
 
-    // 이메일 생성
+    // 인증 이메일을 생성하는 메소드
     public MimeMessage createMail(String mail, String token) {
         MimeMessage message = javaMailSender.createMimeMessage();
 
@@ -41,7 +41,7 @@ public class MailService {
         return message;
     }
 
-    // 이메일 전송
+    // 이메일을 전송하는 메소드
     public void sendMail(String mail, String token) {
         MimeMessage message = createMail(mail, token);
         javaMailSender.send(message);

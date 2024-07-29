@@ -14,18 +14,18 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-    // 회원가입 요청 처리
-    @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody Member member) {
+    // 이메일 인증 요청 엔드포인트
+    @PostMapping("/sendVerificationMail")
+    public ResponseEntity<String> sendVerificationMail(@RequestParam String email) {
         try {
-            memberService.signup(member);
-            return ResponseEntity.ok("회원가입 성공! 이메일 인증을 완료해주세요.");
+            memberService.sendVerificationMail(email);
+            return ResponseEntity.ok("인증 이메일이 발송되었습니다.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("회원가입 실패 사유: " + e.getMessage());
+            return ResponseEntity.badRequest().body("인증 이메일 발송 실패: " + e.getMessage());
         }
     }
 
-    // 이메일 인증 코드 확인 요청 처리
+    // 이메일 인증 확인 엔드포인트
     @PostMapping("/verifyEmail")
     public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String code) {
         boolean isVerified = memberService.checkVerificationCode(email, code);
@@ -36,12 +36,25 @@ public class MemberController {
         }
     }
 
-    // 로그인 요청 처리
+    // 회원가입 요청 엔드포인트
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody Member member) {
+        try {
+            if (!memberService.isEmailVerified(member.getEmail())) {
+                throw new Exception("이메일 인증이 필요합니다.");
+            }
+            memberService.signup(member);
+            return ResponseEntity.ok("회원가입 성공!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("회원가입 실패 사유: " + e.getMessage());
+        }
+    }
+
+    // 로그인 요청 엔드포인트
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Member member, HttpSession session) {
         try {
             Member loggedIn = memberService.login(member);
-            // 세션에 유저 시퀀스 추가
             session.setAttribute("memberSeq", loggedIn.getSeq());
             return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq"));
         } catch (Exception e) {
@@ -49,10 +62,9 @@ public class MemberController {
         }
     }
 
-    // 로그아웃 요청 처리
+    // 로그아웃 요청 엔드포인트
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
-        // 로그아웃 시 세션을 비움
         session.invalidate();
         return ResponseEntity.ok("로그아웃 성공!");
     }

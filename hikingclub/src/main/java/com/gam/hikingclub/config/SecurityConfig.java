@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (개발 환경에서만)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/member/signup", "/member/login").permitAll() // /signup 및 /login 경로는 인증 없이 접근 가능
+                                .requestMatchers("/member/**").permitAll() // /member 경로는 인증 없이 접근 가능
                                 .requestMatchers("/mypage/**").permitAll() // /mypage 경로도 필요없음
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
