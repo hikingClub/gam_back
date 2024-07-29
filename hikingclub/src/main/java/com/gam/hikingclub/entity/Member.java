@@ -7,11 +7,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(name = "MEMBER")
 public class Member {
@@ -29,4 +27,5 @@ public class Member {
     private String jobRange;
     private Integer alarmCheck;
     private String interestKeyword;
+    private boolean verified;
 }
