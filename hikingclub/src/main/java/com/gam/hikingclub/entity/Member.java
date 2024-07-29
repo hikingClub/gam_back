@@ -29,4 +29,5 @@ public class Member {
     private String jobRange;
     private Integer alarmCheck;
     private String interestKeyword;
+    private boolean isVerified;
 }
