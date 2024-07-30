@@ -2,13 +2,12 @@ package com.gam.hikingclub.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gam.hikingclub.dto.SearchResultDTO;
 import com.gam.hikingclub.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -20,21 +19,26 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
-    @PostMapping("/keyword")
-    public ResponseEntity<JsonNode> searchData(@RequestBody SearchResultDTO requestData) {
+    @GetMapping("/keyword")
+    public ResponseEntity<JsonNode> searchData(
+            @RequestParam(value = "searchKeyword") String searchKeyword,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "pageNum", required = false) String pageNum,
+            @RequestParam(value = "pagePer", required = false) String pagePer) {
         try {
             // 기본값 설정
-            String startDate = (requestData.getStartDate() == null || requestData.getStartDate().isEmpty()) ?
-                    LocalDate.now().minusYears(2).toString() : requestData.getStartDate();
-            String endDate = (requestData.getEndDate() == null || requestData.getEndDate().isEmpty()) ?
-                    LocalDate.now().toString() : requestData.getEndDate();
-            String pageNum = (requestData.getPageNum() == null || requestData.getPageNum().isEmpty()) ?
-                    "1" : requestData.getPageNum();
-            String pagePer = (requestData.getPagePer() == null || requestData.getPagePer().isEmpty()) ?
-                    "20" : requestData.getPagePer();
+            startDate = (startDate == null || startDate.isEmpty()) ?
+                    LocalDate.now().minusYears(2).toString() : startDate;
+            endDate = (endDate == null || endDate.isEmpty()) ?
+                    LocalDate.now().toString() : endDate;
+            pageNum = (pageNum == null || pageNum.isEmpty()) ?
+                    "1" : pageNum;
+            pagePer = (pagePer == null || pagePer.isEmpty()) ?
+                    "20" : pagePer;
 
             JsonNode result = searchService.searchData(
-                    requestData.getSearchKeyword(),
+                    searchKeyword,
                     startDate,
                     endDate,
                     pageNum,
