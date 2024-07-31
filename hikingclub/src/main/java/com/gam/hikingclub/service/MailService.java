@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class MailService {
 
     private final JavaMailSender javaMailSender;
-    private static final String senderEmail = "your-email@gmail.com"; // 발신자 이메일 주소
+    private static final String senderEmail = "vlfodn00@gmail.com"; // 발신자 이메일 주소
 
     // 랜덤 인증 코드를 생성하는 메소드
     public static String createToken() {
