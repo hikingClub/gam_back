@@ -1,5 +1,6 @@
 package com.gam.hikingclub.controller;
 
+import com.gam.hikingclub.dto.InterestKeywordDTO;
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
@@ -144,5 +145,29 @@ public class MyPageController {
     public static class UpdatePasswordRequest {
         private String oldPassword;
         private String newPassword;
+    }
+
+    // 관심 키워드 추가 엔드포인트
+    @PostMapping("/addInterestKeywords")
+    public ResponseEntity<String> addInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        try {
+            myPageService.addInterestKeywords(memberSeq, dto.getKeywords());
+            return ResponseEntity.ok("관심 키워드가 성공적으로 추가되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("관심 키워드 추가 실패: " + e.getMessage());
+        }
+    }
+
+    // 관심 키워드 삭제 엔드포인트
+    @PostMapping("/removeInterestKeywords")
+    public ResponseEntity<String> removeInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        try {
+            myPageService.removeInterestKeywords(memberSeq, dto.getKeywords());
+            return ResponseEntity.ok("관심 키워드가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("관심 키워드 삭제 실패: " + e.getMessage());
+        }
     }
 }

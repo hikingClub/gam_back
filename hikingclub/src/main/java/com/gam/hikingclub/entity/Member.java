@@ -1,11 +1,11 @@
 package com.gam.hikingclub.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "MEMBER")
 public class Member {
