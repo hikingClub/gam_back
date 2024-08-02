@@ -96,6 +96,8 @@ public class MyPageService {
             throw new Exception("존재하지 않는 멤버입니다.");
         }
     }
+
+    @Autowired
     private SearchHistoryRepository searchHistoryRepository;
 
     @Autowired
@@ -137,7 +139,9 @@ public class MyPageService {
         Member member = getMemberBySeq(seq);
 
         // 회원의 검색 기록 디비 삭제 더 추가해야할듯 검색기록말고 다른 디비에 존재하는 모두
-        searchHistoryRepository.deleteBySeq(seq);
+        if (searchHistoryRepository.existsBySeq(seq)) {
+            searchHistoryRepository.deleteBySeq(seq);
+        }
 
         // 회원 삭제
         memberRepository.delete(member);

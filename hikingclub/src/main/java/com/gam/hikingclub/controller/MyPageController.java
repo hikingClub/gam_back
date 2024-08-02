@@ -31,7 +31,7 @@ public class MyPageController {
     // 현재 로그인한 유저를 세션에서 가져오는 메서드
     private Member getLoggedInUser(HttpSession session) throws Exception {
         // 이 부분을 통해 강제적으로 Seq를 정해줄 수 있음 postman 테스트용임
-        // Integer memberSeq = 3;
+        //Integer memberSeq = 13;
         Integer memberSeq = (Integer) session.getAttribute("memberSeq");
 
         if (memberSeq == null) {

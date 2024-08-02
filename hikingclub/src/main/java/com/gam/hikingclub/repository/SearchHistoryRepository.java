@@ -9,4 +9,6 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, In
     List<SearchHistory> findBySeq(Integer seq);
 
     void deleteBySeq(Integer seq);
+
+    boolean existsBySeq(Integer seq);
 }
