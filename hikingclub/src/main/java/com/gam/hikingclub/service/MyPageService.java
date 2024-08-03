@@ -94,7 +94,7 @@ public class MyPageService {
     public void addInterestKeywords(Integer memberSeq, List<String> newKeywords) throws Exception {
         Member member = getMemberBySeq(memberSeq);
         List<String> currentKeywords = member.getInterestKeyword() != null
-                ? List.of(member.getInterestKeyword().split(","))
+                ? new ArrayList<>(List.of(member.getInterestKeyword().split(",")))
                 : new ArrayList<>();
         currentKeywords.addAll(newKeywords);
         member.setInterestKeyword(String.join(",", currentKeywords));
@@ -106,7 +106,7 @@ public class MyPageService {
     public void removeInterestKeywords(Integer memberSeq, List<String> keywordsToRemove) throws Exception {
         Member member = getMemberBySeq(memberSeq);
         List<String> currentKeywords = member.getInterestKeyword() != null
-                ? List.of(member.getInterestKeyword().split(","))
+                ? new ArrayList<>(List.of(member.getInterestKeyword().split(",")))
                 : new ArrayList<>();
         currentKeywords.removeAll(keywordsToRemove);
         member.setInterestKeyword(String.join(",", currentKeywords));

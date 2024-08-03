@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -163,6 +164,10 @@ public class MyPageController {
     @PostMapping("/removeInterestKeywords")
     public ResponseEntity<String> removeInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
         Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        System.out.println("Received keywords: " + dto.getKeywords()); // 디버그용 출력
+        if (memberSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
         try {
             myPageService.removeInterestKeywords(memberSeq, dto.getKeywords());
             return ResponseEntity.ok("관심 키워드가 성공적으로 삭제되었습니다.");

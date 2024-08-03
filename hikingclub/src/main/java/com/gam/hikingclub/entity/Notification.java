@@ -10,14 +10,12 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(name="member_seq")
+    private Long id;
     private Integer memberSeq;
+    private String message;
+    private boolean checked;
 
     @ManyToOne
     @JoinColumn(name = "modified_seq", referencedColumnName = "seq")
-    private Modified modified;
-
-    private boolean checked;
+    private Modified modified; // 업데이트된 정보에 대한 참조
 }

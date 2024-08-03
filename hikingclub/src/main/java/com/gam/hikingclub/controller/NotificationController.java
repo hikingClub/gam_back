@@ -23,7 +23,7 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    @PostMapping("/mark-as-checked/{id}")
+    @PostMapping("/checked/{id}")
     public ResponseEntity<String> markAsChecked(@PathVariable Long id) {
         notificationService.markAsChecked(id);
         return ResponseEntity.ok("알림이 확인되었습니다.");

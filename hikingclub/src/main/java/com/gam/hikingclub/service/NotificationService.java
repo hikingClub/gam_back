@@ -7,8 +7,12 @@ import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.ModifiedRepository;
 import com.gam.hikingclub.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -23,15 +27,18 @@ public class NotificationService {
         List<Member> members = memberRepository.findAll();
 
         for (Member member : members) {
-            List<String> interestKeywords = List.of(member.getInterestKeyword().split(","));
-            for (String keyword : interestKeywords) {
-                if (modified.getModifiedTitle().contains(keyword)) {
-                    Notification notification = new Notification();
-                    notification.setMemberSeq(member.getSeq());
-                    notification.setModified(modified);
-                    notification.setChecked(false);
-                    notificationRepository.save(notification);
-                    break;
+            String keywordsString = member.getInterestKeyword();
+            if (keywordsString != null && !keywordsString.trim().isEmpty()) {
+                List<String> interestKeywords = List.of(keywordsString.split(","));
+                for (String keyword : interestKeywords) {
+                    if (modified.getModifiedTitle().contains(keyword)) {
+                        Notification notification = new Notification();
+                        notification.setMemberSeq(member.getSeq());
+                        notification.setModified(modified);
+                        notification.setChecked(false);
+                        notificationRepository.save(notification);
+                        break;
+                    }
                 }
             }
         }
@@ -49,5 +56,14 @@ public class NotificationService {
 
     public void deleteNotification(Long notificationId) {
         notificationRepository.deleteById(notificationId);
+    }
+
+    @Scheduled(fixedDelay = 600000) // 10분마다 실행
+    public void checkModifiedUpdates() {
+        List<Modified> recentModified = modifiedRepository.findAll();
+        for (Modified modified : recentModified) {
+            checkForNewNotifications(modified);
+        }
+        modifiedRepository.deleteAll(); // 모든 데이터를 삭제
     }
 }
