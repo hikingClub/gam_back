@@ -15,12 +15,17 @@ jobs:
 
       - name: Install Amazon Corretto JDK 17
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
-          sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
-          sudo apt-get update
-          sudo apt-get install -y java-17-amazon-corretto-jdk
+          if ! java -version 2>&1 | grep "17.0"; then
+            echo "Java 17 is not installed. Installing Amazon Corretto JDK 17..."
+            sudo apt-get update
+            sudo apt-get install -y wget
+            wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
+            sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
+            sudo apt-get update
+            sudo apt-get install -y java-17-amazon-corretto-jdk
+          else
+            echo "Java 17 is already installed."
+          fi
 
       - name: Set environment variables for Java
         run: |
@@ -73,18 +78,17 @@ jobs:
         run: |
           echo "Verifying downloaded file..."
           find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
-          ls -l ${{ github.workspace }}/hikingclub/build/libs/
 
-      - name: Copy file via SSH
-        uses: appleboy/scp-action@v0.1.1
-        with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USERNAME }}
-          key: ${{ secrets.AWS_KEY }}
-          source: "${{ github.workspace }}/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
-          target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
-          debug: true
-          overwrite: true
+          - name: Copy file via SSH
+            uses: appleboy/scp-action@v0.1.1
+            with:
+              host: ${{ secrets.AWS_HOST }}
+              username: ${{ secrets.AWS_USERNAME }}
+              key: ${{ secrets.AWS_KEY }}
+              source: "${{ github.workspace }}/hikingclub-0.0.1-SNAPSHOT.jar"
+              target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
+              debug: true
+              overwrite: true
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.4
