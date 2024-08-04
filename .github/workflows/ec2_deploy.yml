@@ -17,6 +17,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '17'
+        distribution: 'corretto'  # AWS Corretto JDK 사용
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
