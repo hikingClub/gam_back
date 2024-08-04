@@ -39,7 +39,10 @@ jobs:
         working-directory: hikingclub
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+          export PATH=$JAVA_HOME/bin:$PATH
+          ./gradlew build -x test
         working-directory: hikingclub
       
       - name: List build artifacts
