@@ -10,58 +10,61 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install Amazon Corretto JDK 17
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y wget
-        wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
-        sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
-        sudo apt-get update
-        sudo apt-get install -y java-17-amazon-corretto-jdk
+      - name: Install Amazon Corretto JDK 17
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
+          sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
+          sudo apt-get update
+          sudo apt-get install -y java-17-amazon-corretto-jdk
 
-    - name: Verify Java version
-      run: java -version
+      - name: Verify Java version
+        run: java -version
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Change directory
+        run: cd gam_back/hikingclub
 
-    - name: Build with Gradle
-      run: ./gradlew build -x test
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-    - name: Archive JAR file
-      uses: actions/upload-artifact@v2
-      with:
-        name: hikingclub-jar
-        path: build/libs/hikingclub-0.0.1-SNAPSHOT.jar
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Archive JAR file
+        uses: actions/upload-artifact@v2
+        with:
+          name: hikingclub-jar
+          path: build/libs/hikingclub-0.0.1-SNAPSHOT.jar
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-    - name: Download JAR artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: hikingclub-jar
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: hikingclub-jar
 
-    - name: Copy file via SSH
-      uses: appleboy/scp-action@v0.1.1
-      with:
-        host: ${{ secrets.AWS_HOST }}
-        username: ${{ secrets.AWS_USERNAME }}
-        key: ${{ secrets.AWS_KEY }}
-        source: "hikingclub-0.0.1-SNAPSHOT.jar"
-        target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
+      - name: Copy file via SSH
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_KEY }}
+          source: "gam_back/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
+          target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
 
-    - name: Restart application
-      uses: appleboy/ssh-action@v0.1.4
-      with:
-        host: ${{ secrets.AWS_HOST }}
-        username: ${{ secrets.AWS_USERNAME }}
-        key: ${{ secrets.AWS_KEY }}
-        script: |
-          pkill -f 'java -jar hikingclub-0.0.1-SNAPSHOT.jar' || true
-          nohup java -jar ~/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+      - name: Restart application
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_KEY }}
+          script: |
+            pkill -f 'java -jar hikingclub-0.0.1-SNAPSHOT.jar' || true
+            nohup java -jar ~/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
