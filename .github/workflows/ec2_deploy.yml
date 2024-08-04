@@ -24,9 +24,8 @@ jobs:
 
       - name: Set environment variables for Java
         run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto" | sudo tee -a /etc/environment
-          echo "PATH=$JAVA_HOME/bin:$PATH" | sudo tee -a /etc/environment
-          source /etc/environment
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto" >> $GITHUB_ENV
+          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 
       - name: Verify Java version
         run: |
@@ -44,7 +43,7 @@ jobs:
           export PATH=$JAVA_HOME/bin:$PATH
           ./gradlew build -x test
         working-directory: hikingclub
-      
+
       - name: List build artifacts
         run: ls -lah hikingclub/build/libs/
         working-directory: ${{ github.workspace }}
@@ -56,8 +55,9 @@ jobs:
           path: hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar
 
       - name: Check file existence
-        run: ls -l hikingclub/build/libs/
-        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Checking file existence..."
+          find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar"
 
   deploy:
     runs-on: ubuntu-latest
@@ -69,8 +69,10 @@ jobs:
         with:
           name: hikingclub-jar
 
-      - name: Check downloaded artifact location
-        run: find ${{ github.workspace }} -name "*.jar"
+      - name: Verify downloaded file existence
+        run: |
+          echo "Verifying downloaded file..."
+          ls -l ${{ github.workspace }}/hikingclub/build/libs/
 
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.1
@@ -78,7 +80,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "${{ github.workspace }}/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
