@@ -35,6 +35,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
         working-directory: hikingclub
+      
+      - name: List build artifacts
+        run: ls -lah hikingclub/build/libs/
+        working-directory: ${{ github.workspace }}
 
       - name: Archive JAR file
         uses: actions/upload-artifact@v2
