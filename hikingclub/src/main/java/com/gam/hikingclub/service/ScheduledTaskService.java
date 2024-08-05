@@ -16,10 +16,10 @@ public class ScheduledTaskService {
     private final ModifiedRepository modifiedRepository;
     private final NotificationService notificationService;
 
-    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    @Scheduled(fixedRate = 3600000) // 1시간마다 실행
     public void checkForNewModifications() {
-        // 최근 10분 이내에 추가된 MODIFIED 데이터 검색
-        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusMinutes(10);
+        // 최근 1시간 이내에 추가된 MODIFIED 데이터 검색
+        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusHours(1);
         List<Modified> recentModifications = modifiedRepository.findByCreatedDateAfter(tenMinutesAgo);
 
         for (Modified modified : recentModifications) {
