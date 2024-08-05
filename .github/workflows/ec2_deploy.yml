@@ -75,12 +75,12 @@ jobs:
           find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
 
       - name: Copy file via SSH
-        uses: appleboy/scp-action@v0.1.1
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "/home/runner/work/gam_back/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "~/gam_back/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
