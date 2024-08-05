@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install Amazon Corretto JDK 17
         run: |
@@ -54,7 +54,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Archive JAR file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hikingclub-jar
           path: hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar
@@ -64,7 +64,7 @@ jobs:
     needs: build
 
     steps:
-      - name: Download JAR artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: hikingclub-jar
@@ -72,7 +72,7 @@ jobs:
       - name: Verify downloaded file existence
         run: |
           echo "Verifying downloaded file..."
-          find . -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
+          find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
 
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
@@ -80,7 +80,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "${{ github.workspace }}/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "${{ github.workspace }}/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
