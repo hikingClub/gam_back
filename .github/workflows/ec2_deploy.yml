@@ -72,7 +72,7 @@ jobs:
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
           source: "${{ github.workspace }}/hikingclub-0.0.1-SNAPSHOT.jar"
-          target: "/home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar"
+          target: "/your/desired/path/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
 
@@ -83,7 +83,7 @@ jobs:
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
           script: |
-            chmod 600 /home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar
+            chmod 600 /your/desired/path/hikingclub-0.0.1-SNAPSHOT.jar
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.4
@@ -93,4 +93,4 @@ jobs:
           key: ${{ secrets.AWS_KEY }}
           script: |
             pkill -f 'java -jar hikingclub-0.0.1-SNAPSHOT.jar' || true
-            nohup java -jar /home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            nohup java -jar /your/desired/path/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
