@@ -69,10 +69,11 @@ jobs:
         with:
           name: hikingclub-jar
 
-      - name: Verify downloaded file existence
-        run: |
-          echo "Verifying downloaded file..."
-          find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
+      - name: Verify file existence using ls
+        run: ls -lah /github/workspace/hikingclub-0.0.1-SNAPSHOT.jar || echo "File not found"
+
+      - name: Find JAR file
+        run: find /github/workspace -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
 
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
@@ -80,7 +81,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "${{ github.workspace }}/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "/github/workspace/hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
@@ -92,7 +93,7 @@ jobs:
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
           script: |
-            chmod 600 ~/hikingclub-0.0.1-SNAPSHOT.jar
+            chmod 755 ~/hikingclub-0.0.1-SNAPSHOT.jar
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.4
