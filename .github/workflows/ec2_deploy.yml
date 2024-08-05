@@ -11,50 +11,28 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install Amazon Corretto JDK 17
-        run: |
-          if ! java -version 2>&1 | grep "17.0"; then
-            echo "Java 17 is not installed. Installing Amazon Corretto JDK 17..."
-            sudo apt-get update
-            sudo apt-get install -y wget
-            wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
-            sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
-            sudo apt-get update
-            sudo apt-get install -y java-17-amazon-corretto-jdk
-          else
-            echo "Java 17 is already installed."
-          fi
-
-      - name: Set environment variables for Java
-        run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto" >> $GITHUB_ENV
-          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Verify Java version
-        run: |
-          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
-          export PATH=$JAVA_HOME/bin:$PATH
-          java -version
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         working-directory: hikingclub
 
       - name: Build with Gradle
-        run: |
-          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
-          export PATH=$JAVA_HOME/bin:$PATH
-          ./gradlew build -x test
+        run: ./gradlew build -x test
         working-directory: hikingclub
 
       - name: List build artifacts
         run: ls -lah hikingclub/build/libs/
-        working-directory: ${{ github.workspace }}
+        working-directory: hikingclub
 
       - name: Archive JAR file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: hikingclub-jar
           path: hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar
@@ -65,22 +43,22 @@ jobs:
 
     steps:
       - name: Download JAR artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: hikingclub-jar
 
       - name: Verify downloaded file existence
         run: |
           echo "Verifying downloaded file..."
-          find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
+          find . -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
 
       - name: Copy file via SSH
-        uses: appleboy/scp-action@v0.1.1
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "/home/runner/work/gam_back/hikingclub/build/libs/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
