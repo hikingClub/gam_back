@@ -15,12 +15,17 @@ jobs:
 
       - name: Install Amazon Corretto JDK 17
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
-          sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
-          sudo apt-get update
-          sudo apt-get install -y java-17-amazon-corretto-jdk
+          if ! java -version 2>&1 | grep "17.0"; then
+            echo "Java 17 is not installed. Installing Amazon Corretto JDK 17..."
+            sudo apt-get update
+            sudo apt-get install -y wget
+            wget -qO- https://apt.corretto.aws/corretto.key | sudo apt-key add -
+            sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
+            sudo apt-get update
+            sudo apt-get install -y java-17-amazon-corretto-jdk
+          else
+            echo "Java 17 is already installed."
+          fi
 
       - name: Set environment variables for Java
         run: |
@@ -29,6 +34,8 @@ jobs:
 
       - name: Verify Java version
         run: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+          export PATH=$JAVA_HOME/bin:$PATH
           java -version
 
       - name: Grant execute permission for gradlew
@@ -37,6 +44,8 @@ jobs:
 
       - name: Build with Gradle
         run: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+          export PATH=$JAVA_HOME/bin:$PATH
           ./gradlew build -x test
         working-directory: hikingclub
 
@@ -71,7 +80,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "/github/workspace/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "${{ github.workspace }}/hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
@@ -83,7 +92,7 @@ jobs:
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
           script: |
-            chmod 600 /your/desired/path/hikingclub-0.0.1-SNAPSHOT.jar
+            chmod 600 ~/hikingclub-0.0.1-SNAPSHOT.jar
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.4
@@ -93,4 +102,4 @@ jobs:
           key: ${{ secrets.AWS_KEY }}
           script: |
             pkill -f 'java -jar hikingclub-0.0.1-SNAPSHOT.jar' || true
-            nohup java -jar /your/desired/path/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            nohup java -jar ~/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
