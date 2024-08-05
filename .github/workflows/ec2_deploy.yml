@@ -92,7 +92,7 @@ jobs:
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
           script: |
-            chmod 755 /home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar
+            chmod 600 /home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.4
