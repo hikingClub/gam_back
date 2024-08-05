@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: 
 
 jobs:
   build:
@@ -73,8 +72,7 @@ jobs:
       - name: Verify downloaded file existence
         run: |
           echo "Verifying downloaded file..."
-          ls -lah /home/runner/work/gam_back/gam_back/
-          find /home/runner/work/gam_back/gam_back/ -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
+          find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
 
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
@@ -82,10 +80,19 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "/home/runner/work/gam_back/gam_back/hikingclub-0.0.1-SNAPSHOT.jar"
-          target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "${{ github.workspace }}/hikingclub-0.0.1-SNAPSHOT.jar"
+          target: "/home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
+
+      - name: Set permissions on JAR file
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_KEY }}
+          script: |
+            chmod 755 /home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.4
@@ -95,4 +102,4 @@ jobs:
           key: ${{ secrets.AWS_KEY }}
           script: |
             pkill -f 'java -jar hikingclub-0.0.1-SNAPSHOT.jar' || true
-            nohup java -jar ~/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            nohup java -jar /home/${{ secrets.AWS_USERNAME }}/hikingclub-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
