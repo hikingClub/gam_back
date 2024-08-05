@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: 
+  workflow_dispatch:  # 수동 트리거를 위한 설정
 
 jobs:
   build:
@@ -51,7 +51,9 @@ jobs:
         working-directory: hikingclub
 
       - name: List build artifacts
-        run: ls -lah hikingclub/build/libs/
+        run: |
+          echo "Listing artifacts in build/libs..."
+          ls -lah hikingclub/build/libs/
         working-directory: ${{ github.workspace }}
 
       - name: Archive JAR file
@@ -70,11 +72,11 @@ jobs:
         with:
           name: hikingclub-jar
 
-      - name: Verify file existence using ls
-        run: ls -lah /github/workspace/hikingclub-0.0.1-SNAPSHOT.jar || echo "File not found"
-
-      - name: Find JAR file
-        run: find /github/workspace -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
+      - name: Verify downloaded file existence
+        run: |
+          echo "Verifying downloaded file..."
+          ls -lah ${{ github.workspace }}
+          find ${{ github.workspace }} -name "hikingclub-0.0.1-SNAPSHOT.jar" || echo "File not found"
 
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
@@ -82,7 +84,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          source: "/github/workspace/hikingclub-0.0.1-SNAPSHOT.jar"
+          source: "hikingclub-0.0.1-SNAPSHOT.jar"
           target: "~/hikingclub-0.0.1-SNAPSHOT.jar"
           debug: true
           overwrite: true
