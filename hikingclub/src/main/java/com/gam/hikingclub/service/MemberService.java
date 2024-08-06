@@ -46,6 +46,11 @@ public class MemberService {
         return VerificationStore.isEmailVerified(email);
     }
 
+    // 이메일 중복 체크 메소드
+    public boolean isEmailDuplicate(String email) {
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
     // 아이디 중복 체크 메소드
     public boolean isUidDuplicate(String uid) {
         return memberRepository.findByUid(uid).isPresent();
