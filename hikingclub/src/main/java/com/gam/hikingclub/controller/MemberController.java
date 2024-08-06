@@ -36,6 +36,13 @@ public class MemberController {
         }
     }
 
+    // 아이디 중복 체크 엔드포인트
+    @GetMapping("/checkUid")
+    public ResponseEntity<Boolean> checkUid(@RequestParam String uid) {
+        boolean isDuplicate = memberService.isUidDuplicate(uid);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
     // 회원가입 요청 엔드포인트
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody Member member) {

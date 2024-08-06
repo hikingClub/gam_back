@@ -46,6 +46,11 @@ public class MemberService {
         return VerificationStore.isEmailVerified(email);
     }
 
+    // 아이디 중복 체크 메소드
+    public boolean isUidDuplicate(String uid) {
+        return memberRepository.findByUid(uid).isPresent();
+    }
+
     // 회원가입 메소드
     public void signup(Member member) throws Exception {
         if (!isEmailVerified(member.getEmail())) {
