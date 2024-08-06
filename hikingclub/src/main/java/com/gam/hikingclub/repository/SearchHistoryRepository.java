@@ -11,4 +11,6 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, In
     List<SearchHistory> findBySeq(Integer seq);
     List<SearchHistory> findBySeq(Integer seq, Pageable pageable); // 페이징 및 정렬을 지원하는 메서드 추가
     void deleteBySeq(Integer seq);
+
+    boolean existsBySeq(Integer seq);
 }

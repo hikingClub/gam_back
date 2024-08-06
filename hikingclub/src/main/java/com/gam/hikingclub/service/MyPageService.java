@@ -1,36 +1,29 @@
 package com.gam.hikingclub.service;
 
-
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.RecommendedField;
+import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.RecommendFieldRepository;
-import com.gam.hikingclub.entity.SearchHistory;
-
-import com.gam.hikingclub.entity.Member;
-import com.gam.hikingclub.entity.SearchHistory;
-import com.gam.hikingclub.repository.MemberRepository;
-
 import com.gam.hikingclub.repository.SearchHistoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
+@RequiredArgsConstructor
 public class MyPageService {
 
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private RecommendFieldRepository recommendFieldRepository;
+    private final MemberRepository memberRepository;
+    private final RecommendFieldRepository recommendFieldRepository;
+    private final SearchHistoryRepository searchHistoryRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 숫자로 되어있는 RecIndexes를 RecIndex에 대입해서 가져옴
     public List<String> getRecommendFieldName(Integer seq) throws Exception {
@@ -39,7 +32,6 @@ public class MyPageService {
 
         Optional<Member> optionalMember = memberRepository.findBySeq(seq);
         if (optionalMember.isPresent()) {
-
             // recIndexes가 null인 경우 빈 리스트를 반환
             if (optionalMember.get().getRecIndexes() == null) {
                 System.out.println("recIndexes 값이 비어있습니다.");
@@ -52,7 +44,7 @@ public class MyPageService {
             // 각 문자열을 Integer로 변환
             for (String index : splitRecIndexes) {
                 try {
-                    recIndexList.add(Integer.parseInt(index.trim()));  // 공백 제거 후 Integer로 변환
+                    recIndexList.add(Integer.parseInt(index.trim())); // 공백 제거 후 Integer로 변환
                 } catch (NumberFormatException e) {
                     // 숫자가 아닐 경우
                     System.out.println("잘못된 값이 들어있습니다 : " + index);
@@ -73,7 +65,7 @@ public class MyPageService {
         return recommendList;
     }
 
-    //DTO를 이용해서 관심분야, 나이, 직업을 불러옴
+    // DTO를 이용해서 관심분야, 나이, 직업을 불러옴
     public MemberRecommendDTO getRecommendedSetting(Integer seq) throws Exception {
         Optional<Member> optionalMember = memberRepository.findBySeq(seq);
         if (optionalMember.isEmpty()) {
@@ -96,10 +88,30 @@ public class MyPageService {
             throw new Exception("존재하지 않는 멤버입니다.");
         }
     }
-    private SearchHistoryRepository searchHistoryRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    // 관심 키워드 추가 메서드
+    @Transactional
+    public void addInterestKeywords(Integer memberSeq, List<String> newKeywords) throws Exception {
+        Member member = getMemberBySeq(memberSeq);
+        List<String> currentKeywords = member.getInterestKeyword() != null
+                ? new ArrayList<>(List.of(member.getInterestKeyword().split(",")))
+                : new ArrayList<>();
+        currentKeywords.addAll(newKeywords);
+        member.setInterestKeyword(String.join(",", currentKeywords));
+        memberRepository.save(member);
+    }
+
+    // 관심 키워드 삭제 메서드
+    @Transactional
+    public void removeInterestKeywords(Integer memberSeq, List<String> keywordsToRemove) throws Exception {
+        Member member = getMemberBySeq(memberSeq);
+        List<String> currentKeywords = member.getInterestKeyword() != null
+                ? new ArrayList<>(List.of(member.getInterestKeyword().split(",")))
+                : new ArrayList<>();
+        currentKeywords.removeAll(keywordsToRemove);
+        member.setInterestKeyword(String.join(",", currentKeywords));
+        memberRepository.save(member);
+    }
 
     // memberSeq로 유저 정보를 가져오는 메서드
     public Member getMemberBySeq(int seq) throws Exception {
@@ -133,15 +145,17 @@ public class MyPageService {
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
     }
+
     // 회원을 삭제하는 메소드
     public void deleteUser(int seq) throws Exception {
         Member member = getMemberBySeq(seq);
 
-        // 회원의 검색 기록 디비 삭제 더 추가해야할듯 검색기록말고 다른 디비에 존재하는 모두
-        searchHistoryRepository.deleteBySeq(seq);
+        // 회원의 검색 기록 디비 삭제 (추가 작업 필요)
+        if (searchHistoryRepository.existsBySeq(seq)) {
+            searchHistoryRepository.deleteBySeq(seq);
+        }
 
         // 회원 삭제
         memberRepository.delete(member);
     }
 }
-

@@ -1,5 +1,6 @@
 package com.gam.hikingclub.controller;
 
+import com.gam.hikingclub.dto.InterestKeywordDTO;
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +33,8 @@ public class MyPageController {
     // 현재 로그인한 유저를 세션에서 가져오는 메서드
     private Member getLoggedInUser(HttpSession session) throws Exception {
         // 이 부분을 통해 강제적으로 Seq를 정해줄 수 있음 postman 테스트용임
-        Integer memberSeq = 4;
-        // Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        //Integer memberSeq = 13;
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
 
         if (memberSeq == null) {
             throw new Exception("로그인시 마이페이지에 접근이 가능합니다.");
@@ -144,5 +146,33 @@ public class MyPageController {
     public static class UpdatePasswordRequest {
         private String oldPassword;
         private String newPassword;
+    }
+
+    // 관심 키워드 추가 엔드포인트
+    @PostMapping("/addInterestKeywords")
+    public ResponseEntity<String> addInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        try {
+            myPageService.addInterestKeywords(memberSeq, dto.getKeywords());
+            return ResponseEntity.ok("관심 키워드가 성공적으로 추가되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("관심 키워드 추가 실패: " + e.getMessage());
+        }
+    }
+
+    // 관심 키워드 삭제 엔드포인트
+    @PostMapping("/removeInterestKeywords")
+    public ResponseEntity<String> removeInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        System.out.println("Received keywords: " + dto.getKeywords()); // 디버그용 출력
+        if (memberSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        try {
+            myPageService.removeInterestKeywords(memberSeq, dto.getKeywords());
+            return ResponseEntity.ok("관심 키워드가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("관심 키워드 삭제 실패: " + e.getMessage());
+        }
     }
 }
