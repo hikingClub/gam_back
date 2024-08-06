@@ -124,6 +124,7 @@ public class MyPageService {
         return searchHistoryRepository.findBySeq(seq);
     }
 
+
     // 알람 설정을 업데이트하는 메서드
     public void updateAlarmCheck(int seq, int alarmCheck) throws Exception {
         Member member = getMemberBySeq(seq);
