@@ -6,6 +6,7 @@ import com.gam.hikingclub.dto.KakaoTokenDto;
 import com.gam.hikingclub.dto.LoginResponseDto;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.repository.MemberRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,13 @@ public class AuthService {
     private MemberRepository memberRepository;
 
     @Transactional
-    public LoginResponseDto kakaoLogin(String code) {
+    public LoginResponseDto kakaoLogin(String code, HttpSession session) {
         KakaoTokenDto kakaoTokenDto = getKakaoAccessToken(code);
         KakaoAccountDto kakaoAccountDto = getKakaoUserInfo(kakaoTokenDto.getAccess_token());
 
         Member member = findOrCreateMember(kakaoAccountDto);
+        session.setAttribute("memberSeq", member.getSeq());
+
         LoginResponseDto responseDto = new LoginResponseDto();
         responseDto.setLoginSuccess(true);
         responseDto.setMessage("로그인 성공!");
