@@ -5,14 +5,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class OpenApiExample {
     public static void main(String[] args) {
         String apiKey = "nn15pgmriohhrqmm4cc8nil9y7f0y23q4yz1sido747gquojm4vz2vje6iq3ei5d";
-        String searchKeyword = "정연주"; // 검색 키워드
-        String startDate = "20220701"; // 시작 날짜
-        String endDate = "20230701"; // 종료 날짜
-        String pageNum = "3"; // 요청 페이지 번호
+        String searchKeyword = "요리"; // 검색 키워드
+        String startDate = "20240701"; // 시작 날짜
+        String endDate = "20240731"; // 종료 날짜
+        String pageNum = "1"; // 요청 페이지 번호
         String pagePer = "20"; // 페이지당 목록 수
 
         String jsonInputString = String.format(
