@@ -3,23 +3,32 @@ package com.gam.hikingclub.service;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.util.VerificationStore;
+import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 
     @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private MailService mailService;
+    private final MailService mailService;
 
     private static final long EXPIRY_TIME = 5 * 60 * 1000; // 인증 코드의 유효 시간: 5분
 
@@ -86,5 +95,15 @@ public class MemberService {
             throw new Exception("이메일 인증이 완료되지 않았습니다.");
         }
         return existingMember;
+    }
+
+    public Integer create(Member member) {
+        memberRepository.save(member);
+        return member.getSeq();
+    }
+
+    public Integer findByUid(String uid) {
+        Optional<Member> member = memberRepository.findByUid(uid);
+        return member.map(Member::getSeq).orElse(null);
     }
 }
