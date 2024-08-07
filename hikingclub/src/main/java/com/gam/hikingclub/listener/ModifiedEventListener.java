@@ -24,17 +24,21 @@ public class ModifiedEventListener {
         List<Member> members = memberRepository.findAll();
 
         for (Member member : members) {
-            List<String> interestKeywords = List.of(member.getInterestKeyword().split(","));
-            for (String keyword : interestKeywords) {
-                if (modified.getModifiedTitle().contains(keyword)) {
-                    Notification notification = new Notification();
-                    notification.setMemberSeq(member.getSeq());
-                    notification.setModified(modified);
-                    notification.setChecked(false);
-                    notificationRepository.save(notification);
-                    break;
+            String keywordsString = member.getInterestKeyword();
+            if (keywordsString != null && !keywordsString.trim().isEmpty()) {
+                List<String> interestKeywords = List.of(keywordsString.split(","));
+                for (String keyword : interestKeywords) {
+                    if (modified.getModifiedTitle().contains(keyword.trim())) {
+                        Notification notification = new Notification();
+                        notification.setMemberSeq(member.getSeq());
+                        notification.setMessage(modified.getModifiedTitle()); // MODIFIED 타이틀 설정
+                        notification.setChecked(false); // 초기 상태는 미확인
+                        notificationRepository.save(notification);
+                        break; // 키워드 일치 시 알림 생성 후 다음 멤버로
+                    }
                 }
             }
         }
+
     }
 }

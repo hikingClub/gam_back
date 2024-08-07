@@ -1,5 +1,6 @@
 package com.gam.hikingclub.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class Modified {
 
     private String url;
 
+    @JsonFormat(pattern="yyyy.MM.dd HH:mm:ss")
     @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate = new Date();

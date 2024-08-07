@@ -23,6 +23,13 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<Notification>> getAllNotifications(HttpSession session) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        List<Notification> notifications = notificationService.getAllNotifications(memberSeq);
+        return ResponseEntity.ok(notifications);
+    }
+
     @PostMapping("/checked/{id}")
     public ResponseEntity<String> markAsChecked(@PathVariable Long id) {
         notificationService.markAsChecked(id);

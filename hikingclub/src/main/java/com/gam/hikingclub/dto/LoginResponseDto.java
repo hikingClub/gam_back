@@ -6,4 +6,5 @@ import lombok.Data;
 public class LoginResponseDto {
     private boolean loginSuccess;
     private String message;
+    private boolean isNewUser;
 }

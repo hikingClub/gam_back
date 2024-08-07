@@ -28,12 +28,31 @@ public class AuthService {
         KakaoTokenDto kakaoTokenDto = getKakaoAccessToken(code);
         KakaoAccountDto kakaoAccountDto = getKakaoUserInfo(kakaoTokenDto.getAccess_token());
 
-        Member member = findOrCreateMember(kakaoAccountDto);
+        Optional<Member> optionalMember = memberRepository.findByUid(kakaoAccountDto.getId().toString());
+        Member member;
+        boolean isNewUser;
+
+        if (optionalMember.isPresent()) {
+            member = optionalMember.get();
+            isNewUser = false;
+        } else {
+            member = new Member();
+            member.setUid(kakaoAccountDto.getId().toString());
+            member.setNickname(kakaoAccountDto.getProfile().getNickname());
+            member.setEmail(kakaoAccountDto.getEmail());
+            member.setPassword(""); // 비밀번호 필드는 빈 값으로 설정
+            member.setAlarmCheck(0); // 알람 체크 기본값 설정
+            member.setVerified(true); // 이메일 인증을 강제로 통과시키는 경우
+            memberRepository.save(member);
+            isNewUser = true;
+        }
+
         session.setAttribute("memberSeq", member.getSeq());
 
         LoginResponseDto responseDto = new LoginResponseDto();
         responseDto.setLoginSuccess(true);
-        responseDto.setMessage("로그인 성공!");
+        responseDto.setMessage(isNewUser ? "회원가입 성공!" : "로그인 성공!");
+        responseDto.setNewUser(isNewUser); // 신규 사용자 여부 설정
 
         return responseDto;
     }
@@ -71,6 +90,7 @@ public class AuthService {
         return kakaoTokenDto;
     }
 
+
     private KakaoAccountDto getKakaoUserInfo(String accessToken) {
         RestTemplate rt = new RestTemplate();
 
@@ -97,23 +117,4 @@ public class AuthService {
         return kakaoAccountDto;
     }
 
-    private Member findOrCreateMember(KakaoAccountDto kakaoAccountDto) {
-        Optional<Member> optionalMember = memberRepository.findByUid(kakaoAccountDto.getId().toString());
-        Member member;
-
-        if (optionalMember.isPresent()) {
-            member = optionalMember.get();
-        } else {
-            member = new Member();
-            member.setUid(kakaoAccountDto.getId().toString());
-            member.setNickname(kakaoAccountDto.getProfile().getNickname());
-            member.setEmail(kakaoAccountDto.getEmail());
-            member.setPassword(""); // 비밀번호 필드는 빈 값으로 설정
-            member.setAlarmCheck(0); // 알람 체크 기본값 설정
-            member.setVerified(true); // 이메일 인증을 강제로 통과시키는 경우
-            memberRepository.save(member);
-        }
-
-        return member;
-    }
 }
