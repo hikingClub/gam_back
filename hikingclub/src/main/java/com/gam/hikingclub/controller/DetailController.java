@@ -2,9 +2,7 @@ package com.gam.hikingclub.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
-import com.gam.hikingclub.service.MyPageService;
 import com.gam.hikingclub.service.SearchService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,33 +14,54 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @RestController
-@RequestMapping("/search")
-public class SearchController {
+@RequestMapping("/detail")
+public class DetailController {
 
     @Autowired
     private SearchService searchService;
-    @Autowired
-    private MyPageService myPageService;
 
-
-    @GetMapping("/keyword")
-    public ResponseEntity<JsonNode> searchData(
-            @RequestParam(value = "searchKeyword") String searchKeyword,
-            @RequestParam(value = "startDate", required = false) String startDate,
-            @RequestParam(value = "endDate", required = false) String endDate,
+    @GetMapping("/")
+    public ResponseEntity<JsonNode> getDetailData(
+            @RequestParam(value = "title") String searchKeyword,
+            @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "pageNum", required = false) String pageNum,
             @RequestParam(value = "pagePer", required = false) String pagePer,
+            @RequestParam(value = "docId") String docId,
             HttpSession session) {
         try {
+            String startDate;
+            String endDate;
             // 기본값 설정
-            startDate = (startDate == null || startDate.isEmpty()) ?
-                    LocalDate.now().minusYears(2).toString() : startDate;
-            endDate = (endDate == null || endDate.isEmpty()) ?
-                    LocalDate.now().toString() : endDate;
+            if (date == null || date.isEmpty()) {
+                LocalDate now = LocalDate.now();
+                startDate = "2010-01-01"; // 디지털 집현전의 시작 날짜
+                endDate = now.toString();
+            } else {
+                // date 형식에 따라 startDate와 endDate 설정
+                try {
+                    LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    startDate = parsedDate.toString();
+                    endDate = parsedDate.toString();
+                } catch (DateTimeParseException e1) {
+                    try {
+                        LocalDate parsedDate = LocalDate.parse(date + "-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                        startDate = parsedDate.withDayOfMonth(1).toString();
+                        endDate = parsedDate.withDayOfMonth(parsedDate.lengthOfMonth()).toString();
+                    } catch (DateTimeParseException e2) {
+                        try {
+                            LocalDate parsedDate = LocalDate.parse(date + "-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                            startDate = parsedDate.withDayOfYear(1).toString();
+                            endDate = parsedDate.withDayOfYear(parsedDate.lengthOfYear()).toString();
+                        } catch (DateTimeParseException e3) {
+                            throw new IllegalArgumentException("Invalid date format: " + date);
+                        }
+                    }
+                }
+            }
             pageNum = (pageNum == null || pageNum.isEmpty()) ?
                     "1" : pageNum;
             pagePer = (pagePer == null || pagePer.isEmpty()) ?
@@ -61,7 +80,6 @@ public class SearchController {
             if (session != null) {
                 Integer memberSeq = (Integer) session.getAttribute("memberSeq");
                 if (memberSeq != null) {
-                    System.out.println("memberSeq null아닐때");
                     // SearchHistory 객체 생성 및 설정
                     SearchHistory searchHistory = new SearchHistory();
                     searchHistory.setSeq(memberSeq);
@@ -72,7 +90,6 @@ public class SearchController {
                     searchService.setUserSearchHistory(searchHistory);
                 }
             }
-            System.out.println("그냥 검색 끝");
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {
