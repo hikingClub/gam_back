@@ -29,9 +29,9 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 2acd6511c9ba3a8086adbbf0e5322117  # 카카오 REST API 키
-            client-secret: R39gyqJZ5U3tfdIsYJLtIFkc0PWF57tA  # ${KAKAO_CLIENT_SECRET}으로 변경하여 사용
-            redirect-uri: https://cdn.kyujanggak.com/auto/kakao/callback
+            client-id: 2acd6511c9ba3a8086adbbf0e5322117
+            client-secret: R39gyqJZ5U3tfdIsYJLtIFkc0PWF57tA
+            redirect-uri: http://localhost:8080/oauth/kakao/callback
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email
         provider:
