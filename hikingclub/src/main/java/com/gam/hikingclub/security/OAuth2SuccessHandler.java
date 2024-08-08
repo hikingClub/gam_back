@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Component;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,20 +43,20 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         kakaoInfo.setAlarmCheck(0); // 알람 체크 기본값 설정
         kakaoInfo.setVerified(true); // 이메일 인증을 강제로 통과시키는 경우
 
-        Integer existingMemberSeq = memberService.findByUid(uid);
+        Integer memberSeq = memberService.findByUid(uid);
         boolean isNewMember = false;
-        if (existingMemberSeq == null) {
-            existingMemberSeq = memberService.create(kakaoInfo);
+        if (memberSeq == null) {
+            memberSeq = memberService.create(kakaoInfo);
             isNewMember = true;
         } else {
-            kakaoInfo.setSeq(existingMemberSeq);
+            kakaoInfo.setSeq(memberSeq);
         }
-        request.getSession().setAttribute("memberSeq", existingMemberSeq);
+        request.getSession().setAttribute("memberSeq", memberSeq);
 
         // JSON 응답 생성
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("message", isNewMember ? "signup_success" : "login_success");
-        responseData.put("memberSeq", existingMemberSeq);
+        responseData.put("memberSeq", memberSeq);
         responseData.put("member", kakaoInfo);
 
         response.setContentType("application/json");
