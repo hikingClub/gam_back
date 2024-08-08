@@ -43,21 +43,20 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         kakaoInfo.setAlarmCheck(0); // 알람 체크 기본값 설정
         kakaoInfo.setVerified(true); // 이메일 인증을 강제로 통과시키는 경우
 
-        Integer seq = memberService.findByUid(uid);
+        Integer existingMemberSeq = memberService.findByUid(uid);
         boolean isNewMember = false;
-        if (seq == null) {
-            seq = memberService.create(kakaoInfo);
-            kakaoInfo.setSeq(seq);
+        if (existingMemberSeq == null) {
+            existingMemberSeq = memberService.create(kakaoInfo);
             isNewMember = true;
         } else {
-            kakaoInfo.setSeq(seq);
+            kakaoInfo.setSeq(existingMemberSeq);
         }
-        request.getSession().setAttribute("memberSeq", seq);
+        request.getSession().setAttribute("memberSeq", existingMemberSeq);
 
         // JSON 응답 생성
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("message", isNewMember ? "signup_success" : "login_success");
-        responseData.put("memberSeq", seq); 
+        responseData.put("memberSeq", existingMemberSeq);
         responseData.put("member", kakaoInfo);
 
         response.setContentType("application/json");
