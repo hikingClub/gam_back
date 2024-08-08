@@ -4,16 +4,9 @@ import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.util.VerificationStore;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -97,13 +90,13 @@ public class MemberService {
         return existingMember;
     }
 
-    public Integer create(Member member) {
-        memberRepository.save(member);
-        return member.getSeq();
-    }
-
     public Integer findByUid(String uid) {
         Optional<Member> member = memberRepository.findByUid(uid);
         return member.map(Member::getSeq).orElse(null);
+    }
+
+    public Integer create(Member member) {
+        Member savedMember = memberRepository.save(member);
+        return savedMember.getSeq(); // 저장 후 실제 seq 값 반환
     }
 }
