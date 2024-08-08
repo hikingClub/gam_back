@@ -90,13 +90,15 @@ public class MemberService {
         return existingMember;
     }
 
+    // uid로 멤버 찾는 메소드
     public Integer findByUid(String uid) {
         Optional<Member> member = memberRepository.findByUid(uid);
         return member.map(Member::getSeq).orElse(null);
     }
 
+    // 멤버 생성하는 메소드
     public Integer create(Member member) {
         Member savedMember = memberRepository.save(member);
-        return savedMember.getSeq(); // 저장 후 실제 seq 값 반환
+        return savedMember.getSeq();
     }
 }
