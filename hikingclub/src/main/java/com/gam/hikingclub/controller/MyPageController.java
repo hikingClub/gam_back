@@ -148,6 +148,17 @@ public class MyPageController {
         private String newPassword;
     }
 
+    // 관심 키워드 조회
+    @GetMapping("/members/{seq}/interestKeywords")
+    public ResponseEntity<List<String>> getInterestKeywords(@PathVariable Integer seq) {
+        try {
+            List<String> keywords = myPageService.getInterestKeywords(seq);
+            return ResponseEntity.ok(keywords);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
     // 관심 키워드 추가 엔드포인트
     @PostMapping("/addInterestKeywords")
     public ResponseEntity<String> addInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {

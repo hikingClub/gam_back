@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 
 @Service
@@ -89,6 +91,15 @@ public class MyPageService {
         }
     }
 
+    // 관심 키워드 조회 메서드
+    public List<String> getInterestKeywords(Integer memberSeq) throws Exception {
+        Member member = getMemberBySeq(memberSeq);
+        if (member.getInterestKeyword() == null || member.getInterestKeyword().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return List.of(member.getInterestKeyword().split(","));
+    }
+
     // 관심 키워드 추가 메서드
     @Transactional
     public void addInterestKeywords(Integer memberSeq, List<String> newKeywords) throws Exception {
@@ -96,6 +107,11 @@ public class MyPageService {
         List<String> currentKeywords = member.getInterestKeyword() != null
                 ? new ArrayList<>(List.of(member.getInterestKeyword().split(",")))
                 : new ArrayList<>();
+        Set<String> combinedKeywords = new HashSet<>(currentKeywords);
+        combinedKeywords.addAll(newKeywords);
+        if (combinedKeywords.size() > 5) {
+            throw new Exception("키워드는 최대 5개까지 추가할 수 있습니다.");
+        }
         currentKeywords.addAll(newKeywords);
         member.setInterestKeyword(String.join(",", currentKeywords));
         memberRepository.save(member);
