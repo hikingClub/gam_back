@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        String uid = attributes.get("id").toString();
+        String uid = attributes.get("id").toString(); // int를 String으로 변환하여 저장
         Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
         String nickname = properties.get("nickname").toString();
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
@@ -47,6 +47,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         boolean isNewMember = false;
         if (seq == null) {
             seq = memberService.create(kakaoInfo);
+            kakaoInfo.setSeq(seq);
             isNewMember = true;
         } else {
             kakaoInfo.setSeq(seq);
@@ -56,6 +57,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // JSON 응답 생성
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("message", isNewMember ? "signup_success" : "login_success");
+        responseData.put("memberSeq", seq); 
         responseData.put("member", kakaoInfo);
 
         response.setContentType("application/json");
