@@ -65,7 +65,7 @@ public class SearchService {
         return findDocById(searchResults, docId);
     }
 
-    private JsonNode findDocById(JsonNode searchResults, String docId) {
+    public JsonNode findDocById(JsonNode searchResults, String docId) {
         if (searchResults.has("documents")) {
             Iterator<JsonNode> elements = searchResults.get("documents").elements();
             while (elements.hasNext()) {

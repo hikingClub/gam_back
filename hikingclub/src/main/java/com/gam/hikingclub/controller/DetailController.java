@@ -2,6 +2,7 @@ package com.gam.hikingclub.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.service.SearchService;
 import jakarta.servlet.http.HttpSession;
@@ -75,21 +76,37 @@ public class DetailController {
                     pageNum,
                     pagePer
             );
+            // 검색 결과에서 totalCount 필드 확인
+            int totalCount = result.path("totalCount").asInt();
+            System.out.println("totalcount : " + totalCount);
+            if (totalCount > 2) {
+                JsonNode doc = searchService.findDocById(result, docId);
+                // 문서를 찾지 못한 경우 에러 처리
+                if (doc == null) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode errorResponse = objectMapper.createObjectNode()
+                            .put("message", "Document not found for docId: " + docId)
+                            .put("totalCount", 0);
 
-            // 로그인된 사용자 확인
-            if (session != null) {
-                Integer memberSeq = (Integer) session.getAttribute("memberSeq");
-                if (memberSeq != null) {
-                    // SearchHistory 객체 생성 및 설정
-                    SearchHistory searchHistory = new SearchHistory();
-                    searchHistory.setSeq(memberSeq);
-                    searchHistory.setKeyword(searchKeyword);
-                    searchHistory.setKeywordTime(LocalDateTime.now());
-
-                    // SearchHistory 저장
-                    searchService.setUserSearchHistory(searchHistory);
+                    return ResponseEntity.status(404).body(errorResponse);
                 }
             }
+
+
+//            // 로그인된 사용자 확인
+//            if (session != null) {
+//                Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+//                if (memberSeq != null) {
+//                    // SearchHistory 객체 생성 및 설정
+//                    SearchHistory searchHistory = new SearchHistory();
+//                    searchHistory.setSeq(memberSeq);
+//                    searchHistory.setKeyword(searchKeyword);
+//                    searchHistory.setKeywordTime(LocalDateTime.now());
+//
+//                    // SearchHistory 저장
+//                    searchService.setUserSearchHistory(searchHistory);
+//                }
+//            }
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {

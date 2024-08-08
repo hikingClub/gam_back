@@ -9,39 +9,22 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Iterator;
 
 
 @Service
 public class DetailService {
 
-    @Value("${api.key}")
-    private String apiKey;
-
-    public JsonNode searchData(String searchKeyword, String startDate, String endDate, String pageNum, String pagePer) throws Exception {
-        String jsonInputString = String.format(
-                "{\"searchKeyword\": \"%s\", \"startDate\": \"%s\", \"endDate\": \"%s\", \"pageNum\": \"%s\", \"pagePer\": \"%s\"}",
-                searchKeyword, startDate, endDate, pageNum, pagePer
-        );
-
-        System.out.println("Using API Key: " + apiKey.substring(0, 5) + "****");
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://metalink.k-knowledge.kr/search/openapi/search"))
-                .header("Content-Type", "application/json")
-                .header("api_key", apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString(jsonInputString))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            // JSON 응답을 JsonNode로 변환
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readTree(response.body());
-        } else {
-            throw new RuntimeException("오류 사유 : " + response.statusCode());
+    private JsonNode findDocById(JsonNode searchResults, String docId) {
+        if (searchResults.has("documents")) {
+            Iterator<JsonNode> elements = searchResults.get("documents").elements();
+            while (elements.hasNext()) {
+                JsonNode doc = elements.next();
+                if (doc.has("doc_id") && doc.get("doc_id").asText().equals(docId)) {
+                    return doc;
+                }
+            }
         }
+        return null; // doc_id를 찾지 못한 경우
     }
-
 }

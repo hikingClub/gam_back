@@ -36,6 +36,13 @@ public class MemberController {
         }
     }
 
+    // 이메일 중복 체크 엔드포인트
+    @GetMapping("/checkEmail")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean isDuplicate = memberService.isEmailDuplicate(email);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
     // 아이디 중복 체크 엔드포인트
     @GetMapping("/checkUid")
     public ResponseEntity<Boolean> checkUid(@RequestParam String uid) {

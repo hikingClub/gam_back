@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: hikingclub
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql1.cr2ool1q9cto.ap-northeast-2.rds.amazonaws.com:3306/hikingclub?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root  # ${DB_USERNAME}으로 변경하여 사용
+    password: mysql123  # ${DB_PASSWORD}으로 변경하여 사용
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vlfodn00@gmail.com  # ${MAIL_USERNAME}으로 변경하여 사용
+    password: qnyxiurjscafavpx  # ${MAIL_PASSWORD}으로 변경하여 사용
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 2acd6511c9ba3a8086adbbf0e5322117  # 카카오 REST API 키
+            client-secret: R39gyqJZ5U3tfdIsYJLtIFkc0PWF57tA  # ${KAKAO_CLIENT_SECRET}으로 변경하여 사용
+            redirect-uri: https://cdn.kyujanggak.com/auto/kakao/callback
+            authorization-grant-type: authorization_code
+            scope: profile_nickname, account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+server:
+  port: 8080
+  address: 0.0.0.0
