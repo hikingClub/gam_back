@@ -7,6 +7,7 @@ import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.SearchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,11 +17,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SearchService {
+
+    @Value("${api.key}")
+    private String apiKey;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -28,19 +33,19 @@ public class SearchService {
     @Autowired
     private SearchHistoryRepository searchHistoryRepository;
 
-    private static final String API_KEY = "nn15pgmriohhrqmm4cc8nil9y7f0y23q4yz1sido747gquojm4vz2vje6iq3ei5d";
-
     public JsonNode searchData(String searchKeyword, String startDate, String endDate, String pageNum, String pagePer) throws Exception {
         String jsonInputString = String.format(
                 "{\"searchKeyword\": \"%s\", \"startDate\": \"%s\", \"endDate\": \"%s\", \"pageNum\": \"%s\", \"pagePer\": \"%s\"}",
                 searchKeyword, startDate, endDate, pageNum, pagePer
         );
 
+        System.out.println("Using API Key: " + apiKey.substring(0, 5) + "****");
+
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://metalink.k-knowledge.kr/search/openapi/search"))
                 .header("Content-Type", "application/json")
-                .header("api_key", API_KEY)
+                .header("api_key", apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(jsonInputString))
                 .build();
 
@@ -53,6 +58,24 @@ public class SearchService {
         } else {
             throw new RuntimeException("오류 사유 : " + response.statusCode());
         }
+    }
+
+    public JsonNode getDataByDocId(String searchKeyword, String startDate, String endDate, String pageNum, String pagePer, String docId) throws Exception {
+        JsonNode searchResults = searchData(searchKeyword, startDate, endDate, pageNum, pagePer);
+        return findDocById(searchResults, docId);
+    }
+
+    public JsonNode findDocById(JsonNode searchResults, String docId) {
+        if (searchResults.has("result")) {
+            Iterator<JsonNode> elements = searchResults.get("result").elements();
+            while (elements.hasNext()) {
+                JsonNode doc = elements.next();
+                if (doc.has("doc_id") && doc.get("doc_id").asText().equals(docId)) {
+                    return doc;
+                }
+            }
+        }
+        return null; // doc_id를 찾지 못한 경우
     }
 
    //  유저의 검색 기록 저장하는 메서드

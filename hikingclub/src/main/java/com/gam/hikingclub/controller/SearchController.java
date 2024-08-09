@@ -59,10 +59,8 @@ public class SearchController {
 
             // 로그인된 사용자 확인
             if (session != null) {
-                // Integer memberSeq = (Integer) session.getAttribute("memberSeq");
-                Integer memberSeq = 4;
+                Integer memberSeq = (Integer) session.getAttribute("memberSeq");
                 if (memberSeq != null) {
-                    System.out.println("memberSeq null아닐때");
                     // SearchHistory 객체 생성 및 설정
                     SearchHistory searchHistory = new SearchHistory();
                     searchHistory.setSeq(memberSeq);
@@ -73,7 +71,6 @@ public class SearchController {
                     searchService.setUserSearchHistory(searchHistory);
                 }
             }
-            System.out.println("그냥 검색 끝");
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {

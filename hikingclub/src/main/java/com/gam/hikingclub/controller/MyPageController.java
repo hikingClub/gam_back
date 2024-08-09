@@ -4,6 +4,7 @@ import com.gam.hikingclub.dto.InterestKeywordDTO;
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
+import com.gam.hikingclub.entity.ViewHistory;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.service.MemberService;
 import com.gam.hikingclub.service.MyPageService;
@@ -80,6 +81,18 @@ public class MyPageController {
         try {
             Member member = getLoggedInUser(session);
             List<SearchHistory> history = myPageService.getUserSearchHistory(member.getSeq());
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("조회 실패 사유: " + e.getMessage());
+        }
+    }
+
+    // 조회 기록을 가져오는 엔드포인트
+    @GetMapping("/viewhistory")
+    public ResponseEntity<?> getViewHistory(HttpSession session) {
+        try {
+            Member member = getLoggedInUser(session);
+            List<ViewHistory> history = myPageService.getUserViewHistory(member.getSeq());
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             return ResponseEntity.status(401).body("조회 실패 사유: " + e.getMessage());

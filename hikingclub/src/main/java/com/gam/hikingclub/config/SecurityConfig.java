@@ -25,6 +25,7 @@ public class SecurityConfig {
                                 .requestMatchers("/member/**").permitAll() // /member 경로는 인증 없이 접근 가능
                                 .requestMatchers("/mypage/**").permitAll() // /mypage 경로도 인증 없이 접근 가능
                                 .requestMatchers("/search/**").permitAll() // /search 경로도 인증 없이 접근 가능
+                                .requestMatchers("/detail/**").permitAll() // /detail 경로도 인증 없이 접근 가능
                                 .requestMatchers("/login/**").permitAll()
                                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 );

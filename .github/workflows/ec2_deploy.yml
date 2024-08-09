@@ -48,6 +48,8 @@ jobs:
           export PATH=$JAVA_HOME/bin:$PATH
           ./gradlew build -x test
         working-directory: hikingclub
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
 
       - name: List build artifacts
         run: ls -lah hikingclub/build/libs/

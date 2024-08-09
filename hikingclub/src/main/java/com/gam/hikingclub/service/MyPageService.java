@@ -4,9 +4,11 @@ import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.RecommendedField;
 import com.gam.hikingclub.entity.SearchHistory;
+import com.gam.hikingclub.entity.ViewHistory;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.RecommendFieldRepository;
 import com.gam.hikingclub.repository.SearchHistoryRepository;
+import com.gam.hikingclub.repository.ViewHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +30,9 @@ public class MyPageService {
     private SearchHistoryRepository searchHistoryRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ViewHistoryRepository viewHistoryRepository;
+
 
     // 숫자로 되어있는 RecIndexes를 RecIndex에 대입해서 가져옴
     public List<String> getRecommendFieldName(Integer seq) throws Exception {
@@ -147,6 +152,10 @@ public class MyPageService {
     // 유저의 검색 기록을 가져오는 메서드
     public List<SearchHistory> getUserSearchHistory(int seq) {
         return searchHistoryRepository.findBySeq(seq);
+    }
+
+    public List<ViewHistory> getUserViewHistory(int seq) {
+        return viewHistoryRepository.findBySeq(seq);
     }
 
 
