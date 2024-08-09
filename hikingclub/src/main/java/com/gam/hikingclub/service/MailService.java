@@ -7,6 +7,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -44,6 +46,35 @@ public class MailService {
     // 이메일을 전송하는 메소드
     public void sendMail(String mail, String token) {
         MimeMessage message = createMail(mail, token);
+        javaMailSender.send(message);
+    }
+
+    // 알림 이메일을 생성 및 전송하는 메소드
+    public void sendNotificationMail(String mail, List<String> messageContents) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(senderEmail);
+            helper.setTo(mail);
+            helper.setSubject("디지털 규장각 구독 설정 알림입니다.");
+
+            StringBuilder bodyBuilder = new StringBuilder();
+            bodyBuilder.append("<h3>디지털 규장각 구독 키워드 알림입니다.</h3>");
+            bodyBuilder.append("<h3>추가된 데이터 제목:</h3>");
+
+            for (String content : messageContents) {
+                bodyBuilder.append("<p>").append(content).append("</p>");
+            }
+
+            bodyBuilder.append("<h3>자세한 내용을 디지털 규장각 마이페이지 내 구독설정에서 확인하세요.</h3>");
+            bodyBuilder.append("<h3><a href=\"https://cdn.kyujanggak.com/\">이동하기</a></h3>");
+
+            helper.setText(bodyBuilder.toString(), true);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
         javaMailSender.send(message);
     }
 }

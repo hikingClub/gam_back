@@ -4,6 +4,7 @@ import com.gam.hikingclub.dto.InterestKeywordDTO;
 import com.gam.hikingclub.dto.MemberRecommendDTO;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
+import com.gam.hikingclub.entity.ViewHistory;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.service.MemberService;
 import com.gam.hikingclub.service.MyPageService;
@@ -86,6 +87,18 @@ public class MyPageController {
         }
     }
 
+    // 조회 기록을 가져오는 엔드포인트
+    @GetMapping("/viewhistory")
+    public ResponseEntity<?> getViewHistory(HttpSession session) {
+        try {
+            Member member = getLoggedInUser(session);
+            List<ViewHistory> history = myPageService.getUserViewHistory(member.getSeq());
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("조회 실패 사유: " + e.getMessage());
+        }
+    }
+
     // 설정 정보를 가져오는 엔드포인트
     @GetMapping("/settings")
     public ResponseEntity<?> getUserSettings(HttpSession session) {
@@ -146,6 +159,17 @@ public class MyPageController {
     public static class UpdatePasswordRequest {
         private String oldPassword;
         private String newPassword;
+    }
+
+    // 관심 키워드 조회
+    @GetMapping("/members/{seq}/interestKeywords")
+    public ResponseEntity<List<String>> getInterestKeywords(@PathVariable Integer seq) {
+        try {
+            List<String> keywords = myPageService.getInterestKeywords(seq);
+            return ResponseEntity.ok(keywords);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     // 관심 키워드 추가 엔드포인트

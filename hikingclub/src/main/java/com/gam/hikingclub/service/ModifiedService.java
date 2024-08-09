@@ -19,5 +19,4 @@ public class ModifiedService {
         modifiedRepository.save(modified);
         eventPublisher.publishEvent(new ModifiedEvent(this, modified));
     }
-
 }

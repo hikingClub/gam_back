@@ -1,7 +1,10 @@
 package com.gam.hikingclub.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 @Entity
@@ -14,8 +17,10 @@ public class Notification {
     private Integer memberSeq;
     private String message;
     private boolean checked;
+    private String modifiedId;
+    private String date;
 
-    @ManyToOne
-    @JoinColumn(name = "modified_seq", referencedColumnName = "seq")
-    private Modified modified; // 업데이트된 정보에 대한 참조
+    @JsonFormat(pattern="yyyy.MM.dd HH:mm:ss") // JSON 직렬화 시 형식 지정
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date modifiedDate;
 }

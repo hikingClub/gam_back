@@ -36,6 +36,13 @@ public class MemberController {
         }
     }
 
+    // 이메일 중복 체크 엔드포인트
+    @GetMapping("/checkEmail")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean isDuplicate = memberService.isEmailDuplicate(email);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
     // 아이디 중복 체크 엔드포인트
     @GetMapping("/checkUid")
     public ResponseEntity<Boolean> checkUid(@RequestParam String uid) {
@@ -63,7 +70,9 @@ public class MemberController {
         try {
             Member loggedIn = memberService.login(member);
             session.setAttribute("memberSeq", loggedIn.getSeq());
-            return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq"));
+            session.setAttribute("alarmCheck", loggedIn.getAlarmCheck());
+            return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq")
+                                                                 + " 알람체크 여부: " + session.getAttribute("alarmCheck"));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("로그인 실패 사유: " + e.getMessage());
         }

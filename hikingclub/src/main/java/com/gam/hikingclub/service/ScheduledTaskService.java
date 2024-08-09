@@ -19,18 +19,17 @@ public class ScheduledTaskService {
     @Scheduled(fixedRate = 3600000) // 1시간마다 실행
     public void checkForNewModifications() {
         // 최근 1시간 이내에 추가된 MODIFIED 데이터 검색
-        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusHours(1);
-        List<Modified> recentModifications = modifiedRepository.findByCreatedDateAfter(tenMinutesAgo);
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        List<Modified> recentModifications = modifiedRepository.findByCreatedDateAfter(oneHourAgo);
 
-        for (Modified modified : recentModifications) {
-            notificationService.checkForNewNotifications(modified);
-        }
+        // 한 번에 모든 Modified 데이터를 NotificationService로 넘김
+        notificationService.checkForNewNotifications(recentModifications);
 
         // 작업 완료 후 MODIFIED 테이블 비우기
         clearModifiedTable();
     }
 
     private void clearModifiedTable() {
-        modifiedRepository.truncateTable();
+        modifiedRepository.deleteAllInBatch(); // 모든 데이터를 배치 삭제
     }
 }
