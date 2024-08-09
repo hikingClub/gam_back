@@ -9,6 +9,7 @@ import com.gam.hikingclub.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,11 +19,16 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
+    private final MailService mailService;
 
     // Modified 데이터를 기반으로 사용자의 알람을 생성하는 메서드
     public void checkForNewNotifications(Modified modified) {
         List<Member> members = memberRepository.findAll();
         for (Member member : members) {
+
+            String email = member.getEmail();
+            List<String> notificationsToSend = new ArrayList<>();
+
             String keywordsString = member.getInterestKeyword();
             if (keywordsString != null && !keywordsString.trim().isEmpty()) {
                 List<String> interestKeywords = List.of(keywordsString.split(",")).stream()
@@ -42,11 +48,20 @@ public class NotificationService {
                             notification.setChecked(false);
                             notification.setModifiedDate(modified.getCreatedDate());
                             notification.setModifiedId(modified.getModifiedId());
+                            notification.setDate(modified.getDate());
                             notificationRepository.save(notification);
+
+                            // 이메일 알림 내용에 추가
+                            notificationsToSend.add(message);
                         }
                         break;
                     }
                 }
+            }
+
+            // 모아둔 알림들을 한 번에 이메일로 발송
+            if (!notificationsToSend.isEmpty()) {
+                mailService.sendNotificationMail(email, notificationsToSend);
             }
         }
     }
