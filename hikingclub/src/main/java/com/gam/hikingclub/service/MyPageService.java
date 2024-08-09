@@ -8,6 +8,7 @@ import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.RecommendFieldRepository;
 import com.gam.hikingclub.repository.SearchHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +20,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MyPageService {
 
-    private final MemberRepository memberRepository;
-    private final RecommendFieldRepository recommendFieldRepository;
-    private final SearchHistoryRepository searchHistoryRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private RecommendFieldRepository recommendFieldRepository;
+    @Autowired
+    private SearchHistoryRepository searchHistoryRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // 숫자로 되어있는 RecIndexes를 RecIndex에 대입해서 가져옴
     public List<String> getRecommendFieldName(Integer seq) throws Exception {
