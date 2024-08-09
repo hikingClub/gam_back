@@ -12,11 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +94,9 @@ public class MyPageService {
         if (member.getInterestKeyword() == null || member.getInterestKeyword().isEmpty()) {
             return new ArrayList<>();
         }
-        return List.of(member.getInterestKeyword().split(","));
+        return Arrays.stream(member.getInterestKeyword().split(","))
+                     .map(String::trim)
+                     .collect(Collectors.toList());
     }
 
     // 관심 키워드 추가 메서드
@@ -112,8 +111,13 @@ public class MyPageService {
         if (combinedKeywords.size() > 5) {
             throw new Exception("키워드는 최대 5개까지 추가할 수 있습니다.");
         }
-        currentKeywords.addAll(newKeywords);
-        member.setInterestKeyword(String.join(",", currentKeywords));
+        // 비어있는 리스트에 처음으로 추가할 때 쉼표 없이 추가
+        if (currentKeywords.isEmpty() && !newKeywords.isEmpty()) {
+            member.setInterestKeyword(String.join("", newKeywords));
+        } else {
+            currentKeywords.addAll(newKeywords);
+            member.setInterestKeyword(String.join(",", currentKeywords));
+        }
         memberRepository.save(member);
     }
 
