@@ -24,6 +24,8 @@ public class Modified {
 
     private String url;
 
+    private String date;
+
     @JsonFormat(pattern="yyyy.MM.dd HH:mm:ss")
     @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
