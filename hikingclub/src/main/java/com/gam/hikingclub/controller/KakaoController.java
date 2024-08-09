@@ -34,8 +34,10 @@ public class KakaoController {
 
                 // 세션에 사용자 정보 저장
                 session.setAttribute("memberSeq", loginResponse.getMember().getSeq());
+                session.setAttribute("alarmCheck", loginResponse.getMember().getAlarmCheck());
                 // 성공 메시지 반환
-                return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq"));
+                return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq")
+                                                                     + " 알람체크 여부: " + session.getAttribute("alarmCheck"));
             } else {
                 // 로그인 실패 시
                 return ResponseEntity.status(401).body("로그인 실패: 사용자 정보를 가져올 수 없습니다.");
