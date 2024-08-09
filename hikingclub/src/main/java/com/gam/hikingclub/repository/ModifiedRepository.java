@@ -16,7 +16,7 @@ public interface ModifiedRepository extends JpaRepository<Modified, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM Modified")
-    void truncateTable();
+    void deleteAllInBatch();
 
     List<Modified> findByCreatedDateAfter(LocalDateTime tenMinutesAgo);
 }

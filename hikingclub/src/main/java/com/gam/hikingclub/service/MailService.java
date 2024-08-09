@@ -68,6 +68,7 @@ public class MailService {
             }
 
             bodyBuilder.append("<h3>자세한 내용을 디지털 규장각 마이페이지 내 구독설정에서 확인하세요.</h3>");
+            bodyBuilder.append("<h3><a href=\"https://cdn.kyujanggak.com/\">이동하기</a></h3>");
 
             helper.setText(bodyBuilder.toString(), true);
         } catch (MessagingException e) {
