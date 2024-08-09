@@ -17,6 +17,8 @@ public class Notification {
     private Integer memberSeq;
     private String message;
     private boolean checked;
+    private String modifiedId;
+    private String date;
 
     @JsonFormat(pattern="yyyy.MM.dd HH:mm:ss") // JSON 직렬화 시 형식 지정
     @Temporal(TemporalType.TIMESTAMP)

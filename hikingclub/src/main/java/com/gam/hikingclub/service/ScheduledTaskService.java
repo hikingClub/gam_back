@@ -22,15 +22,14 @@ public class ScheduledTaskService {
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
         List<Modified> recentModifications = modifiedRepository.findByCreatedDateAfter(oneHourAgo);
 
-        for (Modified modified : recentModifications) {
-            notificationService.checkForNewNotifications(modified);
-        }
+        // 한 번에 모든 Modified 데이터를 NotificationService로 넘김
+        notificationService.checkForNewNotifications(recentModifications);
 
         // 작업 완료 후 MODIFIED 테이블 비우기
         clearModifiedTable();
     }
 
     private void clearModifiedTable() {
-        modifiedRepository.deleteAll(); // 모든 데이터를 삭제
+        modifiedRepository.deleteAllInBatch(); // 모든 데이터를 배치 삭제
     }
 }

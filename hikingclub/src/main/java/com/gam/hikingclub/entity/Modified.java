@@ -19,7 +19,12 @@ public class Modified {
     @Column(name = "modified_title")
     private String modifiedTitle;
 
+    @Column(name = "modified_id")
+    private String modifiedId;
+
     private String url;
+
+    private String date;
 
     @JsonFormat(pattern="yyyy.MM.dd HH:mm:ss")
     @Column(name = "created_date", updatable = false)
