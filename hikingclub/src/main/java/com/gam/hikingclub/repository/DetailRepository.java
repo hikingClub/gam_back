@@ -1,4 +1,7 @@
 package com.gam.hikingclub.repository;
 
-public interface DetailRepository {
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface DetailRepository  {
 }
