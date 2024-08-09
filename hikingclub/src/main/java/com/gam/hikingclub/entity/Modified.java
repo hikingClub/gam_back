@@ -19,6 +19,9 @@ public class Modified {
     @Column(name = "modified_title")
     private String modifiedTitle;
 
+    @Column(name = "modified_id")
+    private String modifiedId;
+
     private String url;
 
     @JsonFormat(pattern="yyyy.MM.dd HH:mm:ss")

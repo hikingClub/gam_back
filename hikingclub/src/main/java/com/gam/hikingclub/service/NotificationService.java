@@ -22,11 +22,9 @@ public class NotificationService {
     // Modified 데이터를 기반으로 사용자의 알람을 생성하는 메서드
     public void checkForNewNotifications(Modified modified) {
         List<Member> members = memberRepository.findAll();
-
         for (Member member : members) {
             String keywordsString = member.getInterestKeyword();
             if (keywordsString != null && !keywordsString.trim().isEmpty()) {
-                // 중복 키워드 제거
                 List<String> interestKeywords = List.of(keywordsString.split(",")).stream()
                         .map(String::trim)
                         .distinct()
@@ -34,7 +32,6 @@ public class NotificationService {
 
                 for (String keyword : interestKeywords) {
                     if (modified.getModifiedTitle().contains(keyword)) {
-                        // 동일한 메시지로 이미 알림이 존재하는지 확인
                         String message = modified.getModifiedTitle();
                         boolean exists = notificationRepository.existsByMemberSeqAndMessage(member.getSeq(), message);
 
@@ -44,9 +41,10 @@ public class NotificationService {
                             notification.setMessage(message);
                             notification.setChecked(false);
                             notification.setModifiedDate(modified.getCreatedDate());
+                            notification.setModifiedId(modified.getModifiedId());
                             notificationRepository.save(notification);
                         }
-                        break; // 키워드 일치 시 중복 알림 방지를 위해 반복 종료
+                        break;
                     }
                 }
             }
