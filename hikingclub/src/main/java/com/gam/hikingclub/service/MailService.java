@@ -45,8 +45,14 @@ public class MailService {
 
     // 이메일을 전송하는 메소드
     public void sendMail(String mail, String token) {
-        MimeMessage message = createMail(mail, token);
-        javaMailSender.send(message);
+        try {
+            MimeMessage message = createMail(mail, token);
+            javaMailSender.send(message);
+            System.out.println("이메일이 성공적으로 전송되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("이메일 전송 중 예외가 발생했습니다: " + e.getMessage());
+        }
     }
 
     // 알림 이메일을 생성 및 전송하는 메소드
@@ -68,7 +74,7 @@ public class MailService {
             }
 
             bodyBuilder.append("<h3>자세한 내용을 디지털 규장각 마이페이지 내 구독설정에서 확인하세요.</h3>");
-            bodyBuilder.append("<h3><a href=\"https://cdn.kyujanggak.com/\">이동하기</a></h3>");
+            bodyBuilder.append("<h3><a href=\"https://cdn.kyujanggak.com/\">디지털 규장각으로 이동하기</a></h3>");
 
             helper.setText(bodyBuilder.toString(), true);
         } catch (MessagingException e) {
@@ -76,5 +82,43 @@ public class MailService {
         }
 
         javaMailSender.send(message);
+    }
+
+    // 임시 비밀번호 이메일을 생성하는 메소드
+    public MimeMessage createPasswordMail(String mail, String temporaryPassword) {
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(senderEmail);
+            helper.setTo(mail);
+            helper.setSubject("디지털 규장각 임시 비밀번호 안내입니다.");
+
+            String body = "<h3>안녕하세요,</h3>" +
+                    "<h3>요청하신 임시 비밀번호를 안내 드립니다.</h3>" +
+                    "<p>임시 비밀번호: <strong>" + temporaryPassword + "</strong></p>" +
+                    "<p>임시 비밀번호는 보안에 취약하니 로그인 후 비밀번호를 꼭 변경해 주세요.</p>" +
+                    "<p>감사합니다.</p>" +
+                    "<h3><a href=\"https://cdn.kyujanggak.com/\">디지털 규장각으로 이동하기</a></h3>";
+
+            helper.setText(body, true);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+        return message;
+    }
+
+    // 임시 비밀번호 이메일을 생성하고 전송하는 메서드
+    public void sendTemporaryPasswordMail(String email, String temporaryPassword) {
+        try {
+            MimeMessage message = createPasswordMail(email, temporaryPassword); // 이메일 내용을 생성
+            javaMailSender.send(message); // 이메일 전송
+            System.out.println("임시 비밀번호가 포함된 이메일이 성공적으로 전송되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("임시 비밀번호 이메일 전송 중 예외가 발생했습니다: " + e.getMessage());
+        }
     }
 }

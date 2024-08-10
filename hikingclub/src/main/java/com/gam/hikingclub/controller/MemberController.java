@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/member")
 public class MemberController {
@@ -84,4 +86,27 @@ public class MemberController {
         session.invalidate();
         return ResponseEntity.ok("로그아웃 성공!");
     }
+
+    // 닉네임과 이메일을 이용해 UID를 찾는 엔드포인트
+    @GetMapping("/findUid")
+    public ResponseEntity<String> findUid(@RequestParam String nickname, @RequestParam String email) {
+        Optional<String> uid = memberService.findUidByNicknameAndEmail(nickname, email);
+        if (uid.isPresent()) {
+            return ResponseEntity.ok("사용자의 아이디는: " + uid.get());
+        } else {
+            return ResponseEntity.badRequest().body("해당 닉네임과 이메일로 아이디를 찾을 수 없습니다.");
+        }
+    }
+
+    // 임시 비밀번호 요청 엔드포인트
+    @PostMapping("/findPW")
+    public ResponseEntity<String> findPassword(@RequestParam String uid, @RequestParam String email) {
+        try {
+            memberService.sendTemporaryPassword(uid, email);
+            return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("임시 비밀번호 발급 실패: " + e.getMessage());
+        }
+    }
+
 }
