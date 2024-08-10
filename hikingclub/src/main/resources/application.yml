@@ -31,7 +31,8 @@ spring:
           kakao:
             client-id: 2acd6511c9ba3a8086adbbf0e5322117
             client-secret: R39gyqJZ5U3tfdIsYJLtIFkc0PWF57tA
-            redirect-uri: http://localhost:5173/login/oauth2/callback/kakao
+            redirect-uri: http://localhost:5173/login/oauth2/callback/kakao # 로컬용 redirect-uri
+            # redirect-uri:https://cdn.kyujanggak.com/login/oauth2/callback/kakao # 배포용 redirect-uri
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email
         provider:
