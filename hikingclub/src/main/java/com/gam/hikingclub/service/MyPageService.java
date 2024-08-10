@@ -1,16 +1,13 @@
 package com.gam.hikingclub.service;
 
 import com.gam.hikingclub.dto.MemberRecommendDTO;
-import com.gam.hikingclub.entity.Member;
-import com.gam.hikingclub.entity.RecommendedField;
-import com.gam.hikingclub.entity.SearchHistory;
-import com.gam.hikingclub.entity.ViewHistory;
-import com.gam.hikingclub.repository.MemberRepository;
-import com.gam.hikingclub.repository.RecommendFieldRepository;
-import com.gam.hikingclub.repository.SearchHistoryRepository;
-import com.gam.hikingclub.repository.ViewHistoryRepository;
+import com.gam.hikingclub.entity.*;
+import com.gam.hikingclub.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +29,8 @@ public class MyPageService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ViewHistoryRepository viewHistoryRepository;
+    @Autowired
+    private EmpathyRepository empathyRepository;
 
 
     // 숫자로 되어있는 RecIndexes를 RecIndex에 대입해서 가져옴
@@ -143,6 +142,15 @@ public class MyPageService {
         memberRepository.save(member);
     }
 
+    public void setEmpathy(Empathy empathy) throws Exception {
+        Optional<Member> optionalMember = memberRepository.findBySeq(empathy.getSeq());
+        if (optionalMember.isPresent()) {
+            empathyRepository.save(empathy);
+        } else {
+            throw new Exception("seq값이 존재하지 않는 멤버입니다.");
+        }
+    }
+
     // memberSeq로 유저 정보를 가져오는 메서드
     public Member getMemberBySeq(int seq) throws Exception {
         return memberRepository.findBySeq(seq)
@@ -154,11 +162,48 @@ public class MyPageService {
         return searchHistoryRepository.findBySeq(seq);
     }
 
+    // 유저의 조회 기록을 가져오는 메서드
     public List<ViewHistory> getUserViewHistory(int seq) {
         return viewHistoryRepository.findBySeq(seq);
     }
 
+    // 유저의 검색 기록을 가져오는 메서드
+    public List<Empathy> getEmpathy(int seq) {
+        return empathyRepository.findBySeq(seq);
+    }
 
+    @Transactional
+    public void deleteUserSearchHistory(int idx) throws Exception {
+        Optional<SearchHistory> searchHistory = searchHistoryRepository.findByIdx(idx);
+        if (searchHistory.isPresent()) {
+            searchHistoryRepository.deleteByIdx(idx);
+        }
+        else {
+            throw new Exception("존재하지 않는 검색 기록입니다.");
+        }
+    }
+
+    @Transactional
+    public void deleteUserViewHistory(int idx) throws Exception {
+        Optional<ViewHistory> viewHistory = viewHistoryRepository.findByIdx(idx);
+        if (viewHistory.isPresent()) {
+            viewHistoryRepository.deleteByIdx(idx);
+        }
+        else {
+            throw new Exception("존재하지 않는 검색 기록입니다.");
+        }
+    }
+
+    @Transactional
+    public void deleteUserEmpathy(int idx) throws Exception {
+        Optional<Empathy> empathy = empathyRepository.findByIdx(idx);
+        if (empathy.isPresent()) {
+            empathyRepository.deleteByIdx(idx);
+        }
+        else {
+            throw new Exception("존재하지 않는 검색 기록입니다.");
+        }
+    }
     // 알람 설정을 업데이트하는 메서드
     public void updateAlarmCheck(int seq, int alarmCheck) throws Exception {
         Member member = getMemberBySeq(seq);
@@ -185,8 +230,18 @@ public class MyPageService {
         Member member = getMemberBySeq(seq);
 
         // 회원의 검색 기록 디비 삭제 (추가 작업 필요)
+        // 회원의 조회 기록 디비 삭제
+        // 회원의 공감 내역 삭제
         if (searchHistoryRepository.existsBySeq(seq)) {
             searchHistoryRepository.deleteBySeq(seq);
+        }
+
+        if (viewHistoryRepository.existsBySeq(seq)) {
+            viewHistoryRepository.deleteBySeq(seq);
+        }
+
+        if (empathyRepository.existsBySeq(seq)) {
+            empathyRepository.deleteBySeq(seq);
         }
 
         // 회원 삭제

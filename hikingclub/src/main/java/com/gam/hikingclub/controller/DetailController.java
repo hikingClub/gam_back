@@ -3,18 +3,15 @@ package com.gam.hikingclub.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.gam.hikingclub.entity.Document;
-import com.gam.hikingclub.entity.SearchHistory;
-import com.gam.hikingclub.entity.ViewHistory;
+import com.gam.hikingclub.entity.*;
 import com.gam.hikingclub.service.DetailService;
+import com.gam.hikingclub.service.MyPageService;
 import com.gam.hikingclub.service.SearchService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +28,9 @@ public class DetailController {
 
     @Autowired
     private DetailService detailService;
+
+    @Autowired
+    private MyPageService myPageService;
 
 
     @GetMapping("")
@@ -177,6 +177,34 @@ public class DetailController {
                     .put("totalCount", 0);
 
             return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    //공감 추가하는 부분
+    @PostMapping("/setEmpathy")
+    public ResponseEntity<String> setEmpathy(HttpSession session, @RequestBody Empathy empathy) {
+        try {
+            Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+            empathy.setSeq(memberSeq);
+            myPageService.setEmpathy(empathy);
+            return ResponseEntity.ok("성공!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("에러 이유" + e.getMessage());
+        }
+    }
+
+    //공감 추가하는 부분
+    @PostMapping("/deleteEmpathy")
+    public ResponseEntity<String> deleteEmpathy(HttpSession session, @RequestBody Empathy empathy) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        if (memberSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        try {
+            myPageService.deleteUserEmpathy(empathy.getIdx());
+            return ResponseEntity.ok("공감 내역이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("에러 이유" + e.getMessage());
         }
     }
 }

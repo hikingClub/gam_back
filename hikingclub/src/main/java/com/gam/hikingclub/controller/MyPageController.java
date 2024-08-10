@@ -2,6 +2,7 @@ package com.gam.hikingclub.controller;
 
 import com.gam.hikingclub.dto.InterestKeywordDTO;
 import com.gam.hikingclub.dto.MemberRecommendDTO;
+import com.gam.hikingclub.entity.Empathy;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.entity.ViewHistory;
@@ -87,6 +88,23 @@ public class MyPageController {
         }
     }
 
+    // 검색 기록 삭제 엔드포인트
+    @PostMapping("/kwdhistory/delete")
+    public ResponseEntity<String> deleteUserHistory(HttpSession session, @RequestBody SearchHistory searchHistory) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        System.out.println(memberSeq);
+        System.out.println(searchHistory.getIdx());
+        if (memberSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        try {
+            myPageService.deleteUserSearchHistory(searchHistory.getIdx());
+            return ResponseEntity.ok("검색 기록이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("검색 기록 삭제 실패: " + e.getMessage());
+        }
+    }
+
     // 조회 기록을 가져오는 엔드포인트
     @GetMapping("/viewhistory")
     public ResponseEntity<?> getViewHistory(HttpSession session) {
@@ -96,6 +114,48 @@ public class MyPageController {
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             return ResponseEntity.status(401).body("조회 실패 사유: " + e.getMessage());
+        }
+    }
+
+    // 조회 기록 삭제 엔드포인트
+    @PostMapping("/viewhistory/delete")
+    public ResponseEntity<String> deleteViewHistory(HttpSession session, @RequestBody ViewHistory viewHistory) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        if (memberSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        try {
+            myPageService.deleteUserViewHistory(viewHistory.getIdx());
+            return ResponseEntity.ok("조회 기록이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("조회 기록 삭제 실패: " + e.getMessage());
+        }
+    }
+
+    // 공감 목록을 가져오는 엔드포인트
+    @GetMapping("/empathy")
+    public ResponseEntity<?> getEmpathy(HttpSession session) {
+        try {
+            Member member = getLoggedInUser(session);
+            List<Empathy> empathy = myPageService.getEmpathy(member.getSeq());
+            return ResponseEntity.ok(empathy);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("조회 실패 사유: " + e.getMessage());
+        }
+    }
+
+    // 공감 기록 삭제 엔드포인트
+    @PostMapping("/empathy/delete")
+    public ResponseEntity<String> deleteEmpathy(HttpSession session, @RequestBody Empathy empathy) {
+        Integer memberSeq = (Integer) session.getAttribute("memberSeq");
+        if (memberSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        try {
+            myPageService.deleteUserEmpathy(empathy.getIdx());
+            return ResponseEntity.ok("공감 내역이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("공감 내역 삭제 실패: " + e.getMessage());
         }
     }
 

@@ -16,7 +16,7 @@ public class Empathy {
     private Integer idx;
 
     private Integer seq;
-    private String viewTitle;
+    private String empathyTitle;
     private String docId;
     private String date;
 }
