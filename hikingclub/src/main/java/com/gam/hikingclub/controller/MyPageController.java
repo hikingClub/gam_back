@@ -99,7 +99,7 @@ public class MyPageController {
         }
     }
 
-    // 설정 정보를 가져오는 엔드포인트
+    // 사용자 설정 정보를 가져오는 엔드포인트
     @GetMapping("/settings")
     public ResponseEntity<?> getUserSettings(HttpSession session) {
         try {
@@ -161,7 +161,7 @@ public class MyPageController {
         private String newPassword;
     }
 
-    // 관심 키워드 조회
+    // 구독설정 키워드 조회
     @GetMapping("/members/{seq}/interestKeywords")
     public ResponseEntity<List<String>> getInterestKeywords(@PathVariable Integer seq) {
         try {
@@ -172,7 +172,7 @@ public class MyPageController {
         }
     }
 
-    // 관심 키워드 추가 엔드포인트
+    // 구독설정 키워드 추가 엔드포인트
     @PostMapping("/addInterestKeywords")
     public ResponseEntity<String> addInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
         Integer memberSeq = (Integer) session.getAttribute("memberSeq");
@@ -184,7 +184,7 @@ public class MyPageController {
         }
     }
 
-    // 관심 키워드 삭제 엔드포인트
+    // 구독설정 키워드 삭제 엔드포인트
     @PostMapping("/removeInterestKeywords")
     public ResponseEntity<String> removeInterestKeywords(HttpSession session, @RequestBody InterestKeywordDTO dto) {
         Integer memberSeq = (Integer) session.getAttribute("memberSeq");
