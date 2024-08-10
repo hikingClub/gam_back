@@ -3,11 +3,14 @@ package com.gam.hikingclub.service;
 import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.util.VerificationStore;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -101,4 +104,40 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
         return savedMember.getSeq();
     }
+
+    // 닉네임과 이메일로 UID 찾는 메서드
+    public Optional<String> findUidByNicknameAndEmail(String nickname, String email) {
+        return memberRepository.findByNicknameAndEmail(nickname, email).map(Member::getUid);
+    }
+
+    // 임시 비밀번호 생성 및 이메일 전송 메서드
+    public void sendTemporaryPassword(String uid, String email) throws Exception {
+        // UID와 이메일로 사용자를 찾음
+        Optional<Member> optionalMember = memberRepository.findByUidAndEmail(uid, email);
+
+        if (optionalMember.isEmpty()) {
+            throw new Exception("존재하지 않는 UID 또는 이메일입니다.");
+        }
+
+        Member member = optionalMember.get();
+
+        // 임시 비밀번호 생성
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[8];
+        secureRandom.nextBytes(randomBytes);
+        String temporaryPassword = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+
+
+        // 생성된 임시 비밀번호를 암호화하여 저장
+        member.setPassword(passwordEncoder.encode(temporaryPassword));
+
+        // 멤버의 임시 비밀번호 사용 플래그를 설정해주는 부분
+        member.setTemporaryPasswordUsed(true);
+
+        memberRepository.save(member);
+
+        // 이메일로 임시 비밀번호 전송
+        mailService.sendTemporaryPasswordMail(email, temporaryPassword);
+    }
+
 }
