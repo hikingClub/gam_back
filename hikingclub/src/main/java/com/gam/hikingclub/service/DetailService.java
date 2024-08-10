@@ -5,6 +5,7 @@ import com.gam.hikingclub.entity.Member;
 import com.gam.hikingclub.entity.SearchHistory;
 import com.gam.hikingclub.entity.ViewHistory;
 import com.gam.hikingclub.repository.DocumentRepository;
+import com.gam.hikingclub.repository.EmpathyRepository;
 import com.gam.hikingclub.repository.MemberRepository;
 import com.gam.hikingclub.repository.ViewHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class DetailService {
     @Autowired
     private ViewHistoryRepository viewHistoryRepository;
 
+    @Autowired
+    private EmpathyRepository empathyRepository;
+
     //동시성 해결을 위한 애노테이션
     @Transactional
     public void setDocument(Document document) throws Exception {
@@ -37,6 +41,7 @@ public class DetailService {
         if (optionalDocument.isPresent()) {
             Document existingDocument = optionalDocument.get();
             existingDocument.setViews(existingDocument.getViews() + 1);
+            existingDocument.setEmpathy(empathyRepository.countByDocId(document.getDocId()));
             documentRepository.save(existingDocument);
         } else {
             document.setViews(1);
