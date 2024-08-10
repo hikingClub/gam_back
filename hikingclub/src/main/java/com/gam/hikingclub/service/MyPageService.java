@@ -222,6 +222,10 @@ public class MyPageService {
 
         // 새로운 비밀번호를 암호화하여 저장
         member.setPassword(passwordEncoder.encode(newPassword));
+
+        // 임시 비밀번호 사용여부 해제
+        member.setTemporaryPasswordUsed(false);
+
         memberRepository.save(member);
     }
 
