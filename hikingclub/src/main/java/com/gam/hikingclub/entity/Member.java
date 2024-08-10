@@ -22,6 +22,7 @@ public class Member {
     private String ageRange;
     private String jobRange;
     private Integer alarmCheck;
-    private String interestKeyword;
-    private boolean verified;
+    private String interestKeyword; // 알람 키워드 설정
+    private boolean verified; // 이메일 인증 여부
+    private boolean temporaryPasswordUsed; // 임시비밀번호 사용여부
 }
