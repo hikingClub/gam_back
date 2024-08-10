@@ -130,6 +130,10 @@ public class MemberService {
 
         // 생성된 임시 비밀번호를 암호화하여 저장
         member.setPassword(passwordEncoder.encode(temporaryPassword));
+
+        // 멤버의 임시 비밀번호 사용 플래그를 설정해주는 부분
+        member.setTemporaryPasswordUsed(true);
+
         memberRepository.save(member);
 
         // 이메일로 임시 비밀번호 전송

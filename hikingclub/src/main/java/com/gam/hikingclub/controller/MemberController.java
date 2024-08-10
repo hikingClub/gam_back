@@ -73,8 +73,10 @@ public class MemberController {
             Member loggedIn = memberService.login(member);
             session.setAttribute("memberSeq", loggedIn.getSeq());
             session.setAttribute("alarmCheck", loggedIn.getAlarmCheck());
+            session.setAttribute("temporaryPasswordUsed", loggedIn.isTemporaryPasswordUsed());
             return ResponseEntity.ok("로그인 성공! 세션 SEQ: " + session.getAttribute("memberSeq")
-                                                                 + " 알람체크 여부: " + session.getAttribute("alarmCheck"));
+                                                                 + " 알람체크 여부: " + session.getAttribute("alarmCheck")
+                                                                 + " 임시 비밀번호 로그인 여부: " + session.getAttribute("temporaryPasswordUsed"));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("로그인 실패 사유: " + e.getMessage());
         }
