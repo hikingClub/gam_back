@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Service
@@ -27,7 +28,7 @@ public class MailService {
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(senderEmail);
+            helper.setFrom(senderEmail, "디지털 규장각"); // 발신자 이메일 주소와 이름 설정
             helper.setTo(mail);
             helper.setSubject("디지털 규장각 이메일 인증번호 입니다.");
             String body = "<h3>안녕하세요,</h3>" +
@@ -36,7 +37,7 @@ public class MailService {
                     "<h1>" + token + "</h1>" +
                     "<h3>감사합니다 디지털 규장각 드림.</h3>";
             helper.setText(body, true);
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -61,12 +62,13 @@ public class MailService {
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(senderEmail);
+            helper.setFrom(senderEmail, "디지털 규장각");
             helper.setTo(mail);
             helper.setSubject("디지털 규장각 구독 설정 알림입니다.");
 
             StringBuilder bodyBuilder = new StringBuilder();
             bodyBuilder.append("<h3>디지털 규장각 구독 키워드 알림입니다.</h3>");
+            bodyBuilder.append("<h3>설정하신 키워드에 해당하는 문서가 추가되었습니다.</h3>");
             bodyBuilder.append("<h3>추가된 데이터 제목:</h3>");
 
             for (String content : messageContents) {
@@ -77,7 +79,7 @@ public class MailService {
             bodyBuilder.append("<h3><a href=\"https://cdn.kyujanggak.com/\">디지털 규장각으로 이동하기</a></h3>");
 
             helper.setText(bodyBuilder.toString(), true);
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -91,7 +93,7 @@ public class MailService {
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(senderEmail);
+            helper.setFrom(senderEmail, "디지털 규장각");
             helper.setTo(mail);
             helper.setSubject("디지털 규장각 임시 비밀번호 안내입니다.");
 
@@ -103,7 +105,7 @@ public class MailService {
                     "<h3><a href=\"https://cdn.kyujanggak.com/\">디지털 규장각으로 이동하기</a></h3>";
 
             helper.setText(body, true);
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 

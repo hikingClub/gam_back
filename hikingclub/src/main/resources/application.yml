@@ -5,14 +5,14 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://mysql1.cr2ool1q9cto.ap-northeast-2.rds.amazonaws.com:3306/hikingclub?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root  # ${DB_USERNAME}으로 변경하여 사용
-    password: mysql123  # ${DB_PASSWORD}으로 변경하여 사용
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: vlfodn00@gmail.com  # ${MAIL_USERNAME}으로 변경하여 사용
-    password: qnyxiurjscafavpx  # ${MAIL_PASSWORD}으로 변경하여 사용
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -29,8 +29,8 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 2acd6511c9ba3a8086adbbf0e5322117
-            client-secret: R39gyqJZ5U3tfdIsYJLtIFkc0PWF57tA
+            client-id: ${client-id}
+            client-secret: ${client-secret}
             redirect-uri: http://localhost:5173/login/oauth2/callback/kakao # 로컬용 redirect-uri
             # redirect-uri:https://cdn.kyujanggak.com/login/oauth2/callback/kakao # 배포용 redirect-uri
             authorization-grant-type: authorization_code
